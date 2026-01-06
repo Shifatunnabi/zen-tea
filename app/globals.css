@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  /* Added Bangla font variable for proper Bengali text rendering */
+  --font-bangla: 'Noto Sans Bengali', system-ui, sans-serif;
+  
+  /* Brand Colors - Zen Tea */
+  --color-primary: #50823c;
+  --color-primary-dark: #162517;
+  --color-accent: #E0F720;
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  
+  /* Semantic Tokens */
+  --color-brand-green: #50823c;
+  --color-brand-dark: #162517;
+  --color-brand-gold: #E0F720;
+  --color-muted: #f5f5f0;
+  --color-muted-foreground: #666666;
+  --color-border: #e5e5e0;
+  
+  /* Component Tokens */
+  --color-card: #ffffff;
+  --color-card-foreground: #0a0a0a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a0a0a;
+  
+  /* Interactive States */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f5f5f0;
+  --color-secondary-foreground: #0a0a0a;
+  --color-accent-foreground: #162517;
+  
+  /* Status Colors */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  
+  /* Borders & Inputs */
+  --color-input: #e5e5e0;
+  --color-ring: #50823c;
+  
+  /* Radius */
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+  
+  /* Added RTL support for Arabic and Bangla font support */
+  html[dir='rtl'] {
+    direction: rtl;
+  }
+  
+  html[lang='bn'] * {
+    font-family: var(--font-bangla), var(--font-sans);
+  }
+}
