@@ -3,7 +3,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 
-const MONGODB_URI = 'mongodb+srv://zentea_db_user:Z5UAqAkAAl3N8VYA@zenteaweb.n9acsnw.mongodb.net/zentea?appName=zenteaweb'
+const MONGODB_URI = process.env.MONGODB_URI
 
 const ML = { en: { type: String, default: '' }, bn: { type: String, default: '' }, ar: { type: String, default: '' } }
 
