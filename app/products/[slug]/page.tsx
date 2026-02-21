@@ -1,272 +1,463 @@
 'use client'
 
-import { notFound } from 'next/navigation'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, CheckCircle, Package } from 'lucide-react'
+import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import { Heart, ShoppingCart, ChevronLeft, ChevronRight, ArrowLeft, CheckCircle, Package, Truck, Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/lib/language-context'
+import { PartnershipCard, QualityGuaranteeCard } from '@/components/sections/partnership-cards'
 
-const getProductsData = (t: any) => ({
-  'zen-classic-black-tea': {
-    name: t({ en: 'Zen Classic Black Tea', bn: 'জেন ক্লাসিক ব্ল্যাক টি', ar: 'شاي زن الأسود الكلاسيكي' }),
-    tagline: t({ en: 'Garden-packed, robust black tea', bn: 'বাগান-প্যাক করা, শক্তিশালী কালো চা', ar: 'شاي أسود قوي معبأ من الحديقة' }),
-    description: t({ 
-      en: 'Crafted with the meticulous "two leaves and a bud" plucking technique, Zen Classic Black Tea reflects the timeless skill of our tea artisans. Their wisdom resonates through the leaves, as they recognize the perfect moment to pluck. This legacy passed down from mothers to daughters ensures that only the finest leaves are included in our blend.', 
-      bn: 'সতর্কতার সাথে "দুটি পাতা এবং একটি কুঁড়ি" তোলা কৌশল দিয়ে তৈরি, জেন ক্লাসিক ব্ল্যাক টি আমাদের চা শিল্পীদের নিরবধি দক্ষতা প্রতিফলিত করে।', 
-      ar: 'مصنوع بتقنية القطف الدقيقة "ورقتان وبرعم"، يعكس شاي زن الأسود الكلاسيكي المهارة الخالدة لحرفيي الشاي لدينا.' 
-    }),
-    longDescription: t({ 
-      en: 'The authenticity of Bangladesh in every cup: strength, flavor, color, and refreshment. This dedication, unity, and continuous mixing tradition ensures vibrant freshness in every sip.', 
-      bn: 'প্রতিটি কাপে বাংলাদেশের সত্যতা: শক্তি, স্বাদ, রঙ এবং সতেজতা।', 
-      ar: 'أصالة بنغلاديش في كل كوب: القوة والنكهة واللون والانتعاش.' 
-    }),
-    features: [
-      t({ en: 'Robust and fresh brewed tea', bn: 'মজবুত এবং তাজা তৈরি চা', ar: 'شاي قوي وطازج' }),
-      t({ en: 'Strong and long-lasting liquor', bn: 'শক্তিশালী এবং দীর্ঘস্থায়ী তরল', ar: 'سائل قوي وطويل الأمد' }),
-      t({ en: 'Sharp and fresh taste', bn: 'তীক্ষ্ণ এবং তাজা স্বাদ', ar: 'طعم حاد وطازج' }),
-      t({ en: 'Rich, long-lasting color', bn: 'সমৃদ্ধ, দীর্ঘস্থায়ী রঙ', ar: 'لون غني وطويل الأمد' }),
-      t({ en: 'Attractive and mind-refreshing flavor', bn: 'আকর্ষণীয় এবং মন-সতেজকারী স্বাদ', ar: 'نكهة جذابة ومنعشة للعقل' }),
-    ],
-    specifications: [
-      { label: t({ en: 'Product/Ingredient', bn: 'পণ্য/উপাদান', ar: 'المنتج/المكون' }), value: t({ en: 'Black Tea', bn: 'কালো চা', ar: 'شاي أسود' }) },
-      { label: t({ en: 'Net Weight', bn: 'নেট ওজন', ar: 'الوزن الصافي' }), value: t({ en: '500 grams', bn: '500 গ্রাম', ar: '500 جرام' }) },
-      { label: t({ en: 'Shelf Life', bn: 'শেল্ফ লাইফ', ar: 'مدة الصلاحية' }), value: t({ en: '24 months from packing date', bn: 'প্যাকিং তারিখ থেকে ২৪ মাস', ar: '24 شهرًا من تاريخ التعبئة' }) },
-      { label: t({ en: 'Storage', bn: 'সংরক্ষণ', ar: 'التخزين' }), value: t({ en: 'Store in a cool and dry place', bn: 'ঠান্ডা এবং শুষ্ক জায়গায় সংরক্ষণ করুন', ar: 'يُحفظ في مكان بارد وجاف' }) },
-      { label: t({ en: 'Origin', bn: 'উৎপত্তি', ar: 'الأصل' }), value: t({ en: 'Sylhet, Sreemangal, Panchagarh, Bangladesh', bn: 'সিলেট, শ্রীমঙ্গল, পঞ্চগড়, বাংলাদেশ', ar: 'سيلهت، سريمانغال، بانشاغار، بنغلاديش' }) },
-      { label: t({ en: 'Certification', bn: 'সার্টিফিকেশন', ar: 'الشهادة' }), value: t({ en: '100% Halal Bangladeshi Product', bn: '100% হালাল বাংলাদেশী পণ্য', ar: '100٪ منتج بنغلاديشي حلال' }) },
-    ],
-    focus: t({ en: 'Traditional flavor, local familiarity', bn: 'ঐতিহ্যবাহী স্বাদ, স্থানীয় পরিচিতি', ar: 'نكهة تقليدية، ألفة محلية' }),
-    image: '/placeholder.svg?height=800&width=800',
-    images: [
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-    ],
-  },
-  'zen-premium-blend-tea': {
-    name: t({ en: 'Zen Premium Blend Tea', bn: 'জেন প্রিমিয়াম ব্লেন্ড টি', ar: 'شاي زن الممتاز المخلوط' }),
-    tagline: t({ en: 'Curated from top-tier leaves', bn: 'শীর্ষ-স্তরের পাতা থেকে সংগৃহীত', ar: 'منسقة من أوراق من الدرجة الأولى' }),
-    description: t({ 
-      en: 'Crafted from the finest tea leaves sourced from the top tea gardens in Sylhet, Sreemangal and Panchagarh of Bangladesh. This tea is entirely chemical-free and will invigorate you with its natural color, taste, and aroma.', 
-      bn: 'বাংলাদেশের সিলেট, শ্রীমঙ্গল এবং পঞ্চগড়ের শীর্ষ চা বাগান থেকে সংগৃহীত সেরা চা পাতা থেকে তৈরি।', 
-      ar: 'مصنوع من أفضل أوراق الشاي من أفضل حدائق الشاي في سيلهت وسريمانغال وبانشاغار في بنغلاديش.' 
-    }),
-    longDescription: t({ 
-      en: 'Selected from the best tea gardens, this premium blend offers the perfect balance of strength and aroma. Each leaf is carefully chosen to deliver a superior tea experience.', 
-      bn: 'সেরা চা বাগান থেকে নির্বাচিত, এই প্রিমিয়াম মিশ্রণ শক্তি এবং সুগন্ধের নিখুঁত ভারসাম্য প্রদান করে।', 
-      ar: 'مختارة من أفضل حدائق الشاي، يقدم هذا المزيج الممتاز التوازن المثالي بين القوة والرائحة.' 
-    }),
-    features: [
-      t({ en: 'Robust and fresh brewed tea', bn: 'মজবুত এবং তাজা তৈরি চা', ar: 'شاي قوي وطازج' }),
-      t({ en: 'Strong and long-lasting liquor', bn: 'শক্তিশালী এবং দীর্ঘস্থায়ী তরল', ar: 'سائل قوي وطويل الأمد' }),
-      t({ en: 'Sharp and fresh taste', bn: 'তীক্ষ্ণ এবং তাজা স্বাদ', ar: 'طعم حاد وطازج' }),
-      t({ en: 'Rich, long-lasting color', bn: 'সমৃদ্ধ, দীর্ঘস্থায়ী রঙ', ar: 'لون غني وطويل الأمد' }),
-      t({ en: 'Attractive and mind-refreshing flavor', bn: 'আকর্ষণীয় এবং মন-সতেজকারী স্বাদ', ar: 'نكهة جذابة ومنعشة للعقل' }),
-    ],
-    specifications: [
-      { label: t({ en: 'Product/Ingredient', bn: 'পণ্য/উপাদান', ar: 'المنتج/المكون' }), value: t({ en: 'Premium Black Tea Blend', bn: 'প্রিমিয়াম কালো চা মিশ্রণ', ar: 'خليط شاي أسود ممتاز' }) },
-      { label: t({ en: 'Net Weight', bn: 'নেট ওজন', ar: 'الوزن الصافي' }), value: t({ en: '500 grams', bn: '500 গ্রাম', ar: '500 جرام' }) },
-      { label: t({ en: 'Shelf Life', bn: 'শেল্ফ লাইফ', ar: 'مدة الصلاحية' }), value: t({ en: '24 months from packing date', bn: 'প্যাকিং তারিখ থেকে ২৪ মাস', ar: '24 شهرًا من تاريخ التعبئة' }) },
-      { label: t({ en: 'Storage', bn: 'সংরক্ষণ', ar: 'التخزين' }), value: t({ en: 'Store in a cool and dry place', bn: 'ঠান্ডা এবং শুষ্ক জায়গায় সংরক্ষণ করুন', ar: 'يُحفظ في مكان بارد وجاف' }) },
-      { label: t({ en: 'Origin', bn: 'উৎপত্তি', ar: 'الأصل' }), value: t({ en: 'Top gardens of Sylhet, Sreemangal & Panchagarh', bn: 'সিলেট, শ্রীমঙ্গল এবং পঞ্চগড়ের শীর্ষ বাগান', ar: 'أفضل حدائق سيلهت وسريمانغال وبانشاغار' }) },
-      { label: t({ en: 'Certification', bn: 'সার্টিফিকেশন', ar: 'الشهادة' }), value: t({ en: '100% Halal, Chemical-free', bn: '100% হালাল, রাসায়নিক-মুক্ত', ar: '100٪ حلال، خالٍ من المواد الكيميائية' }) },
-    ],
-    focus: t({ en: 'Balance of strength and aroma', bn: 'শক্তি এবং সুগন্ধের ভারসাম্য', ar: 'توازن القوة والرائحة' }),
-    image: '/placeholder.svg?height=800&width=800',
-    images: [
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-    ],
-  },
-  'zen-royal-gold-tea': {
-    name: t({ en: 'Zen Royal Gold Tea', bn: 'জেন রয়েল গোল্ড টি', ar: 'شاي زن الذهبي الملكي' }),
-    tagline: t({ en: 'Strong liquor, luxury richness', bn: 'শক্তিশালী তরল, বিলাসবহুল সমৃদ্ধি', ar: 'سائل قوي، ثراء فاخر' }),
-    description: t({ 
-      en: 'More than just a tea; it represents a connection to the land and generations of tea pluckers who have cultivated it as well as embodies the rich cultural heritage of Bangladesh. It is the taste of home, the essence of tradition, and the true flavor of Bangladeshi tea.', 
-      bn: 'শুধু একটি চা নয়; এটি ভূমি এবং চা তোলা প্রজন্মের সাথে একটি সংযোগ প্রতিনিধিত্ব করে।', 
-      ar: 'أكثر من مجرد شاي؛ إنه يمثل اتصالاً بالأرض وأجيال من قاطفي الشاي.' 
-    }),
-    longDescription: t({ 
-      en: 'Not just a tea; it\'s a connection to the cultural relationship with the land and generations of tea artisans who have nurtured tea cultivation for ages. Authentic Tea embodies Bangladesh\'s cultural heritage, delivering the authentic taste of Bangladeshi tea in every cup.', 
-      bn: 'শুধু একটি চা নয়; এটি ভূমির সাথে সাংস্কৃতিক সম্পর্ক এবং প্রজন্মের চা শিল্পীদের সাথে একটি সংযোগ।', 
-      ar: 'ليس مجرد شاي؛ إنه اتصال بالعلاقة الثقافية مع الأرض وأجيال من حرفيي الشاي.' 
-    }),
-    features: [
-      t({ en: 'Robust and fresh brewed tea', bn: 'মজবুত এবং তাজা তৈরি চা', ar: 'شاي قوي وطازج' }),
-      t({ en: 'Strong and long-lasting liquor', bn: 'শক্তিশালী এবং দীর্ঘস্থায়ী তরল', ar: 'سائل قوي وطويل الأمد' }),
-      t({ en: 'Sharp and fresh taste', bn: 'তীক্ষ্ণ এবং তাজা স্বাদ', ar: 'طعم حاد وطازج' }),
-      t({ en: 'Rich, long-lasting color', bn: 'সমৃদ্ধ, দীর্ঘস্থায়ী রঙ', ar: 'لون غني وطويل الأمد' }),
-      t({ en: 'Attractive and mind-refreshing flavor', bn: 'আকর্ষণীয় এবং মন-সতেজকারী স্বাদ', ar: 'نكهة جذابة ومنعشة للعقل' }),
-    ],
-    specifications: [
-      { label: t({ en: 'Product/Ingredient', bn: 'পণ্য/উপাদান', ar: 'المنتج/المكون' }), value: t({ en: 'Royal Gold Black Tea', bn: 'রয়েল গোল্ড কালো চা', ar: 'شاي أسود ذهبي ملكي' }) },
-      { label: t({ en: 'Net Weight', bn: 'নেট ওজন', ar: 'الوزن الصافي' }), value: t({ en: '500 grams', bn: '500 গ্রাম', ar: '500 جرام' }) },
-      { label: t({ en: 'Shelf Life', bn: 'শেল্ফ লাইফ', ar: 'مدة الصلاحية' }), value: t({ en: '24 months from packing date', bn: 'প্যাকিং তারিখ থেকে ২৪ মাস', ar: '24 شهرًا من تاريخ التعبئة' }) },
-      { label: t({ en: 'Storage', bn: 'সংরক্ষণ', ar: 'التخزين' }), value: t({ en: 'Store in a cool and dry place', bn: 'ঠান্ডা এবং শুষ্ক জায়গায় সংরক্ষণ করুন', ar: 'يُحفظ في مكان بارد وجاف' }) },
-      { label: t({ en: 'Origin', bn: 'উৎপত্তি', ar: 'الأصل' }), value: t({ en: 'Premium estates of Bangladesh', bn: 'বাংলাদেশের প্রিমিয়াম এস্টেট', ar: 'العقارات الممتازة في بنغلاديش' }) },
-      { label: t({ en: 'Certification', bn: 'সার্টিফিকেশন', ar: 'الشهادة' }), value: t({ en: '100% Halal Bangladeshi Product', bn: '100% হালাল বাংলাদেশী পণ্য', ar: '100٪ منتج بنغلاديشي حلال' }) },
-    ],
-    focus: t({ en: 'High energy, luxury, everyday richness', bn: 'উচ্চ শক্তি, বিলাসিতা, দৈনন্দিন সমৃদ্ধি', ar: 'طاقة عالية، رفاهية، ثراء يومي' }),
-    image: '/placeholder.svg?height=800&width=800',
-    images: [
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-      '/placeholder.svg?height=600&width=600',
-    ],
-  },
-})
+type TranslationField = { en: string; bn?: string; ar?: string }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
+interface Product {
+  _id: string
+  name: TranslationField
+  slug: string
+  photos: string[]
+  thumbnailIndex: number
+  taglineOne: TranslationField
+  taglineTwo: TranslationField
+  shortDetails: TranslationField
+  description: TranslationField
+  keyFeatures: TranslationField[]
+  regularPrice: number
+  sellingPrice: number
+  unit: TranslationField
+  shippingDetails: TranslationField
+  isHidden: boolean
+}
+
+export default function ProductDetailPage() {
+  const params = useParams()
+  const slug = params?.slug as string
   const { t } = useLanguage()
-  const productsData = getProductsData(t)
-  const product = productsData[params.slug as keyof typeof productsData]
 
-  if (!product) {
-    notFound()
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [quantity, setQuantity] = useState(1)
+  const [activeTab, setActiveTab] = useState<'description' | 'features' | 'shipping'>('description')
+  const autoSlideRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Fetch product data
+  useEffect(() => {
+    if (!slug) return
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`/api/products/slug/${slug}`)
+        if (!res.ok) {
+          setNotFound(true)
+          setLoading(false)
+          return
+        }
+        const data = await res.json()
+        setProduct(data)
+      } catch {
+        setNotFound(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduct()
+  }, [slug])
+
+  // Auto-slide
+  const startAutoSlide = useCallback(() => {
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current)
+    autoSlideRef.current = setInterval(() => {
+      setActiveImageIndex((prev) =>
+        product ? (prev + 1) % product.photos.length : 0
+      )
+    }, 4000)
+  }, [product])
+
+  useEffect(() => {
+    if (product && product.photos.length > 1) {
+      startAutoSlide()
+    }
+    return () => {
+      if (autoSlideRef.current) clearInterval(autoSlideRef.current)
+    }
+  }, [product, startAutoSlide])
+
+  const goToPrevImage = () => {
+    if (!product) return
+    setActiveImageIndex((prev) => (prev - 1 + product.photos.length) % product.photos.length)
+    startAutoSlide()
   }
 
-  return (
-    <>
-      {/* Breadcrumb */}
-      <div className="border-b border-border bg-muted py-4">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t({ en: 'Back to Products', bn: 'পণ্যে ফিরে যান', ar: 'العودة إلى المنتجات' })}
-          </Link>
-        </div>
-      </div>
+  const goToNextImage = () => {
+    if (!product) return
+    setActiveImageIndex((prev) => (prev + 1) % product.photos.length)
+    startAutoSlide()
+  }
 
-      {/* Product Hero */}
-      <section className="py-12 lg:py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Product Image */}
-            <div>
-              <div className="overflow-hidden rounded-lg bg-muted shadow-xl">
-                <img
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              {/* Thumbnail Gallery */}
-              <div className="mt-4 grid grid-cols-3 gap-4">
-                {product.images.map((img, idx) => (
-                  <div key={idx} className="overflow-hidden rounded-md border-2 border-border">
-                    <img
-                      src={img || "/placeholder.svg"}
-                      alt={`${product.name} ${t({ en: 'view', bn: 'দেখুন', ar: 'عرض' })} ${idx + 1}`}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+  const selectThumbnail = (index: number) => {
+    setActiveImageIndex(index)
+    startAutoSlide()
+  }
+
+  const discount = product
+    ? Math.round(((product.regularPrice - product.sellingPrice) / product.regularPrice) * 100)
+    : 0
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Breadcrumb skeleton */}
+          <div className="mb-8 h-5 w-48 animate-pulse rounded bg-muted" />
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+            {/* Image skeleton */}
+            <div className="space-y-4">
+              <div className="aspect-square w-full animate-pulse rounded-2xl bg-muted" />
+              <div className="flex gap-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-16 w-16 animate-pulse rounded-lg bg-muted" />
                 ))}
               </div>
             </div>
-
-            {/* Product Info */}
-            <div>
-              <div className="mb-4 inline-block rounded-full bg-accent px-4 py-1 text-sm font-semibold text-primary-dark">
-                {product.focus}
-              </div>
-              <h1 className="mb-4 font-serif text-4xl font-bold text-foreground lg:text-5xl">
-                {product.name}
-              </h1>
-              <p className="mb-6 text-xl font-medium text-primary">
-                {product.tagline}
-              </p>
-              <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
-                {product.description}
-              </p>
-              <p className="mb-8 leading-relaxed text-muted-foreground">
-                {product.longDescription}
-              </p>
-
-              {/* Features */}
-              <div className="mb-8">
-                <h2 className="mb-4 font-serif text-2xl font-bold text-foreground">
-                  {t({ en: 'Key Features', bn: 'মূল বৈশিষ্ট্য', ar: 'الميزات الرئيسية' })}
-                </h2>
-                <ul className="space-y-3">
-                  {product.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* CTA */}
-              <div className="rounded-lg border-2 border-primary bg-primary/5 p-6">
-                <h3 className="mb-2 font-serif text-xl font-bold text-foreground">
-                  {t({ en: 'Interested in Bulk Orders?', bn: 'বাল্ক অর্ডারে আগ্রহী?', ar: 'مهتم بالطلبات بالجملة؟' })}
-                </h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  {t({ en: 'Contact us for wholesale pricing and partnership opportunities', bn: 'পাইকারি মূল্য এবং অংশীদারিত্বের সুযোগের জন্য আমাদের সাথে যোগাযোগ করুন', ar: 'اتصل بنا للحصول على أسعار الجملة وفرص الشراكة' })}
-                </p>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Button asChild className="flex-1">
-                    <a href="tel:08801711633202">{t({ en: 'Call: 088 01711-633202', bn: 'কল: 088 01711-633202', ar: 'اتصل: 088 01711-633202' })}</a>
-                  </Button>
-                  <Button asChild variant="outline" className="flex-1">
-                    <a href="mailto:zenteabd@gmail.com">{t({ en: 'Email Us', bn: 'ইমেল করুন', ar: 'راسلنا' })}</a>
-                  </Button>
-                </div>
+            {/* Info skeleton */}
+            <div className="space-y-4">
+              <div className="h-8 w-40 animate-pulse rounded-full bg-muted" />
+              <div className="h-10 w-3/4 animate-pulse rounded bg-muted" />
+              <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
+              <div className="h-20 w-full animate-pulse rounded bg-muted" />
+              <div className="h-8 w-1/3 animate-pulse rounded bg-muted" />
+              <div className="flex gap-4">
+                <div className="h-12 w-32 animate-pulse rounded bg-muted" />
+                <div className="h-12 w-32 animate-pulse rounded bg-muted" />
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    )
+  }
 
-      {/* Specifications */}
-      <section className="bg-muted py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="mb-8 font-serif text-3xl font-bold text-foreground">
-            {t({ en: 'Product Specifications', bn: 'পণ্যের বিশেষ বৈশিষ্ট্য', ar: 'مواصفات المنتج' })}
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {product.specifications.map((spec, idx) => (
-              <div key={idx} className="rounded-lg bg-card p-6 shadow">
-                <div className="mb-2 flex items-center gap-2 text-primary">
-                  <Package className="h-5 w-5" />
-                  <h3 className="font-semibold">{spec.label}</h3>
-                </div>
-                <p className="text-muted-foreground">{spec.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Quality Guarantee */}
-      <section className="py-16">
-        <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h2 className="mb-4 font-serif text-3xl font-bold text-foreground">
-            {t({ en: 'Our Quality Promise', bn: 'আমাদের মানের প্রতিশ্রুতি', ar: 'وعد الجودة لدينا' })}
-          </h2>
-          <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-            {t({ 
-              en: 'Every package of Zen Tea is carefully prepared to maintain the highest standards of quality, freshness, and authenticity. We are committed to delivering the true taste of Bangladesh in every cup.', 
-              bn: 'জেন টি-এর প্রতিটি প্যাকেজ গুণমান, সতেজতা এবং সত্যতার সর্বোচ্চ মান বজায় রাখতে সাবধানে প্রস্তুত করা হয়।', 
-              ar: 'يتم إعداد كل عبوة من شاي زن بعناية للحفاظ على أعلى معايير الجودة والنضارة والأصالة.' 
+  // Not found state
+  if (notFound || !product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6 lg:px-8">
+          <Package className="mb-6 h-20 w-20 text-muted-foreground/40" />
+          <h1 className="mb-3 font-serif text-3xl font-bold text-foreground">
+            {t({ en: 'Product Not Found', bn: 'পণ্য পাওয়া যায়নি', ar: 'المنتج غير موجود' })}
+          </h1>
+          <p className="mb-8 max-w-md text-lg text-muted-foreground">
+            {t({
+              en: 'The product you are looking for does not exist or may have been removed.',
+              bn: 'আপনি যে পণ্যটি খুঁজছেন সেটি বিদ্যমান নেই বা সরানো হয়েছে।',
+              ar: 'المنتج الذي تبحث عنه غير موجود أو ربما تمت إزالته.',
             })}
           </p>
-          <div className="rounded-lg bg-primary p-8 text-white">
-            <p className="text-lg font-medium">
-              {t({ 
-                en: '100% Halal • Chemical-Free • Ethically Sourced • 24-Month Shelf Life', 
-                bn: '100% হালাল • রাসায়নিক-মুক্ত • নৈতিকভাবে সংগৃহীত • ২৪ মাসের শেল্ফ লাইফ', 
-                ar: '100٪ حلال • خالٍ من المواد الكيميائية • مصدره أخلاقي • مدة صلاحية 24 شهرًا' 
-              })}
-            </p>
+          <Link href="/products">
+            <Button className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              {t({ en: 'Back to Products', bn: 'পণ্যগুলিতে ফিরে যান', ar: 'العودة إلى المنتجات' })}
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <nav className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link href="/products" className="transition-colors hover:text-primary">
+            {t({ en: 'Products', bn: 'পণ্যসমূহ', ar: 'المنتجات' })}
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">{t(product.name)}</span>
+        </nav>
+
+        {/* Back link */}
+        <Link
+          href="/products"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary-dark"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t({ en: 'Back to Products', bn: 'পণ্যগুলিতে ফিরে যান', ar: 'العودة إلى المنتجات' })}
+        </Link>
+
+        {/* Top Section: Two columns */}
+        <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
+          {/* LEFT: Photo slider */}
+          <div className="space-y-4">
+            {/* Main image */}
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted">
+              {product.photos.length > 0 ? (
+                <Image
+                  src={product.photos[activeImageIndex]}
+                  alt={t(product.name)}
+                  fill
+                  className="object-cover transition-all duration-500"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <Package className="h-20 w-20" />
+                </div>
+              )}
+
+              {/* Arrow buttons */}
+              {product.photos.length > 1 && (
+                <>
+                  <button
+                    onClick={goToPrevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md backdrop-blur-sm transition-colors hover:bg-white"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-foreground" />
+                  </button>
+                  <button
+                    onClick={goToNextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md backdrop-blur-sm transition-colors hover:bg-white"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="h-5 w-5 text-foreground" />
+                  </button>
+                </>
+              )}
+
+              {/* Image counter badge */}
+              {product.photos.length > 1 && (
+                <div className="absolute bottom-3 right-3 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                  {activeImageIndex + 1} / {product.photos.length}
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail strip */}
+            {product.photos.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {product.photos.map((photo, index) => (
+                  <button
+                    key={index}
+                    onClick={() => selectThumbnail(index)}
+                    className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
+                      index === activeImageIndex
+                        ? 'border-primary ring-2 ring-primary/30'
+                        : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <Image
+                      src={photo}
+                      alt={`${t(product.name)} thumbnail ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT: Product info */}
+          <div className="flex flex-col">
+            {/* Tagline One capsule */}
+            {t(product.taglineOne) && (
+              <span className="mb-3 inline-block w-fit rounded-full bg-accent px-4 py-1.5 text-sm font-semibold text-primary-dark">
+                {t(product.taglineOne)}
+              </span>
+            )}
+
+            {/* Product Name */}
+            <h1 className="mb-2 font-serif text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+              {t(product.name)}
+            </h1>
+
+            {/* Tagline Two */}
+            {t(product.taglineTwo) && (
+              <p className="mb-4 text-lg font-medium text-primary">
+                {t(product.taglineTwo)}
+              </p>
+            )}
+
+            {/* Short details */}
+            {t(product.shortDetails) && (
+              <p className="mb-6 leading-relaxed text-muted-foreground">
+                {t(product.shortDetails)}
+              </p>
+            )}
+
+            {/* Price Section */}
+            <div className="mb-6 flex items-end gap-3">
+              <span className="text-3xl font-bold text-foreground">
+                ৳{product.sellingPrice.toLocaleString()}
+              </span>
+              {product.regularPrice > product.sellingPrice && (
+                <>
+                  <span className="text-lg text-muted-foreground line-through">
+                    ৳{product.regularPrice.toLocaleString()}
+                  </span>
+                  <span className="rounded-md bg-red-100 px-2 py-0.5 text-sm font-semibold text-red-600">
+                    -{discount}%
+                  </span>
+                </>
+              )}
+              {t(product.unit) && (
+                <span className="text-sm text-muted-foreground">/ {t(product.unit)}</span>
+              )}
+            </div>
+
+            {/* Quantity selector */}
+            <div className="mb-6">
+              <label className="mb-2 block text-sm font-medium text-foreground">
+                {t({ en: 'Quantity', bn: 'পরিমাণ', ar: 'الكمية' })}
+              </label>
+              <div className="inline-flex items-center rounded-lg border border-border">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="flex h-10 w-10 items-center justify-center rounded-l-lg transition-colors hover:bg-muted"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="h-10 w-14 border-x border-border bg-transparent text-center text-sm font-medium text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                />
+                <button
+                  onClick={() => setQuantity((q) => q + 1)}
+                  className="flex h-10 w-10 items-center justify-center rounded-r-lg transition-colors hover:bg-muted"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="outline"
+                size="lg"
+                className="gap-2 border-primary text-primary hover:bg-primary/5"
+              >
+                <Heart className="h-5 w-5" />
+                {t({ en: 'Add to Favorites', bn: 'পছন্দে যোগ করুন', ar: 'أضف إلى المفضلة' })}
+              </Button>
+              <Button
+                size="lg"
+                className="gap-2 bg-primary text-white hover:bg-primary-dark"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {t({ en: 'Add to Cart', bn: 'কার্টে যোগ করুন', ar: 'أضف إلى السلة' })}
+              </Button>
+            </div>
           </div>
         </div>
-      </section>
-    </>
+
+        {/* Tabs Section */}
+        <div className="mt-16">
+          {/* Tab buttons */}
+          <div className="flex border-b border-border">
+            <button
+              onClick={() => setActiveTab('description')}
+              className={`relative px-5 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'description'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t({ en: 'Description', bn: 'বিবরণ', ar: 'الوصف' })}
+              {activeTab === 'description' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('features')}
+              className={`relative px-5 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'features'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t({ en: 'Key Features', bn: 'মূল বৈশিষ্ট্য', ar: 'الميزات الرئيسية' })}
+              {activeTab === 'features' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('shipping')}
+              className={`relative px-5 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'shipping'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t({ en: 'Shipping Details', bn: 'শিপিং বিবরণ', ar: 'تفاصيل الشحن' })}
+              {activeTab === 'shipping' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+              )}
+            </button>
+          </div>
+
+          {/* Tab content */}
+          <div className="py-8">
+            {/* Description Tab */}
+            {activeTab === 'description' && (
+              <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:font-serif prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground">
+                <div
+                  dangerouslySetInnerHTML={{ __html: t(product.description) }}
+                />
+              </div>
+            )}
+
+            {/* Key Features Tab */}
+            {activeTab === 'features' && (
+              <div className="space-y-3">
+                {product.keyFeatures && product.keyFeatures.length > 0 ? (
+                  product.keyFeatures.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-3 rounded-lg bg-muted/50 p-4"
+                    >
+                      <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                      <span className="text-foreground">{t(feature)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-muted-foreground">
+                    {t({ en: 'No features listed.', bn: 'কোন বৈশিষ্ট্য তালিকাভুক্ত নেই।', ar: 'لا توجد ميزات مدرجة.' })}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Shipping Tab */}
+            {activeTab === 'shipping' && (
+              <div className="flex items-start gap-4 rounded-xl bg-muted/50 p-6">
+                <Truck className="mt-1 h-6 w-6 shrink-0 text-primary" />
+                <div className="prose prose-lg max-w-none text-muted-foreground prose-headings:font-serif prose-headings:text-foreground">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: t(product.shippingDetails) }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Partnership & Quality Guarantee Cards */}
+        <div className="mt-12 space-y-8 pb-16">
+          <PartnershipCard />
+          <QualityGuaranteeCard />
+        </div>
+      </div>
+    </div>
   )
 }

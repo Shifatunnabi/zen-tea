@@ -8,10 +8,11 @@ interface ProductCardProps {
   name: string
   description: string
   image: string
+  hoverImage?: string
   slug: string
 }
 
-export function ProductCard({ name, description, image, slug }: ProductCardProps) {
+export function ProductCard({ name, description, image, hoverImage, slug }: ProductCardProps) {
   const { t } = useLanguage()
 
   return (
@@ -19,12 +20,19 @@ export function ProductCard({ name, description, image, slug }: ProductCardProps
       href={`/products/${slug}`}
       className="group relative overflow-hidden rounded-lg bg-card shadow-lg transition-all hover:shadow-xl"
     >
-      <div className="aspect-square overflow-hidden">
+      <div className="aspect-square overflow-hidden relative">
         <img
           src={image || "/placeholder.svg"}
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105 transition-transform duration-300'}`}
         />
+        {hoverImage && (
+          <img
+            src={hoverImage}
+            alt={`${name} alternate`}
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          />
+        )}
       </div>
       <div className="p-6">
         <h3 className="mb-2 font-serif text-2xl font-bold text-foreground">

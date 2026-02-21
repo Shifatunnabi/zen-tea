@@ -1,172 +1,111 @@
-import { notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Clock, Share2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Loader2 } from 'lucide-react'
+import { useLanguage } from '@/lib/language-context'
 
-const blogData = {
-  'health-benefits-black-tea': {
-    title: 'The Health Benefits of Black Tea: Why It\'s Good for You',
-    date: '2024-01-15',
-    readTime: '5 min read',
-    category: 'Health & Wellness',
-    image: '/placeholder.svg?height=600&width=1200',
-    content: `
-Black tea is more than just a delicious beverage—it's packed with health benefits that have been recognized for centuries. From ancient traditions to modern science, black tea continues to prove its worth as a wellness powerhouse.
-
-## Rich in Antioxidants
-
-Black tea contains powerful antioxidants called polyphenols, which help protect your cells from damage caused by free radicals. These compounds play a crucial role in maintaining overall health and may reduce the risk of chronic diseases.
-
-## Heart Health Benefits
-
-Regular consumption of black tea has been linked to improved heart health. Studies suggest that drinking black tea can help reduce LDL cholesterol levels, lower blood pressure, and improve blood vessel function—all key factors in cardiovascular wellness.
-
-## Mental Alertness and Focus
-
-The combination of caffeine and L-theanine in black tea provides a unique benefit: enhanced mental alertness without the jitters often associated with coffee. This makes it an excellent choice for maintaining focus throughout the day.
-
-## Supports Digestive Health
-
-Black tea contains tannins that have a therapeutic effect on gastric and intestinal illnesses. The polyphenols in tea may also help maintain a healthy gut microbiome, supporting overall digestive wellness.
-
-## May Support Weight Management
-
-Some research suggests that black tea may help with weight management by promoting fat breakdown and reducing calorie intake. The polyphenols in black tea can boost metabolic rate and increase fat oxidation.
-
-## Authentic Quality Matters
-
-At Zen Tea, we ensure that our black tea retains all these beneficial properties through careful cultivation and processing. Our chemical-free approach preserves the natural compounds that make black tea so beneficial for your health.
-
-Choose Zen Tea for authentic Bangladeshi black tea that supports your wellness journey naturally.
-    `,
-  },
-  'bangladesh-tea-heritage': {
-    title: 'The Rich Heritage of Bangladeshi Tea Gardens',
-    date: '2024-01-10',
-    readTime: '7 min read',
-    category: 'Heritage',
-    image: '/placeholder.svg?height=600&width=1200',
-    content: `
-The tea gardens of Bangladesh are more than agricultural lands—they are living testaments to generations of tradition, craftsmanship, and cultural heritage. Journey with us through the verdant hills of Sylhet, Sreemangal, and Panchagarh.
-
-## The Birthplace of Bangladeshi Tea
-
-Bangladesh's tea heritage dates back to the British colonial era, but it has evolved into something uniquely Bangladeshi. The regions of Sylhet and Sreemangal, often called the "tea capital of Bangladesh," produce some of the world's finest teas.
-
-## The Art of Two Leaves and a Bud
-
-At the heart of quality tea production is the "two leaves and a bud" plucking method. This technique, passed down through generations from mothers to daughters, ensures that only the most tender and flavorful leaves make it into your cup.
-
-## Tea Gardens as Communities
-
-Bangladeshi tea gardens are vibrant communities where families have worked for generations. The knowledge and skill of tea cultivation are precious heirlooms, carefully preserved and transmitted through time.
-
-## Regional Characteristics
-
-### Sylhet
-Known for its rolling hills and ideal climate, Sylhet produces teas with robust flavor and excellent color.
-
-### Sreemangal
-The "tea capital" offers diverse microclimates that create unique flavor profiles in its teas.
-
-### Panchagarh
-This northern region produces teas known for their strength and rich liquor, perfect for milk tea lovers.
-
-## Preserving Tradition in Modern Times
-
-At Zen Tea, we honor this heritage by maintaining traditional methods while ensuring quality and sustainability. Our commitment to authentic Bangladeshi tea means supporting the communities and practices that have made our tea culture world-renowned.
-
-Visit our tea gardens in spirit with every cup of Zen Tea—a connection to Bangladesh's rich tea heritage.
-    `,
-  },
-  'perfect-cup-brewing-guide': {
-    title: 'How to Brew the Perfect Cup of Tea: A Complete Guide',
-    date: '2024-01-05',
-    readTime: '6 min read',
-    category: 'Brewing Tips',
-    image: '/placeholder.svg?height=600&width=1200',
-    content: `
-Brewing the perfect cup of tea is both an art and a science. With the right techniques, you can unlock the full flavor potential of your Zen Tea and enjoy an exceptional tea experience every time.
-
-## Essential Equipment
-
-- **Teapot or cup**: Ceramic or glass is preferred for maintaining temperature
-- **Tea strainer**: If using loose leaf tea
-- **Kettle**: For heating water to the precise temperature
-- **Timer**: For perfect steeping time
-- **Quality tea**: Zen Tea, of course!
-
-## The Perfect Brewing Method
-
-### Step 1: Use Fresh, Cold Water
-Always start with fresh, cold water. Previously boiled water loses oxygen and can result in flat-tasting tea.
-
-### Step 2: Heat Water to the Right Temperature
-For black tea, bring water to a full boil (200-212°F / 93-100°C). This ensures optimal extraction of flavors and beneficial compounds.
-
-### Step 3: Warm Your Teapot
-Pour a little hot water into your teapot or cup, swirl it around, and discard. This prevents temperature shock and maintains brewing temperature.
-
-### Step 4: Measure Your Tea
-Use approximately 1 teaspoon of loose tea per cup, or one tea bag. Adjust to taste—more for stronger tea, less for milder.
-
-### Step 5: Steep for the Right Time
-For Zen Tea black varieties, steep for 3-5 minutes:
-- 3 minutes: lighter, more delicate flavor
-- 4 minutes: balanced, traditional strength
-- 5 minutes: robust, strong liquor
-
-### Step 6: Remove Tea Leaves or Bag
-Don't over-steep! Remove the tea leaves or bag after the appropriate time to prevent bitterness.
-
-## Enhancing Your Tea
-
-### Traditional Milk Tea
-Add warm milk after brewing for a classic chai experience. Zen Royal Gold Tea is particularly excellent with milk.
-
-### Sweeteners
-If desired, add sugar, honey, or your preferred sweetener while the tea is hot for best dissolution.
-
-### Spices
-Consider adding cardamom, cinnamon, or ginger for a spiced tea experience.
-
-## Storage Tips
-
-Keep your Zen Tea fresh by storing it in an airtight container in a cool, dry place away from strong odors, light, and moisture.
-
-## Final Thoughts
-
-The perfect cup is ultimately the one you enjoy most. Use these guidelines as a starting point, then adjust to your personal taste preferences. With Zen Tea's premium quality leaves, you're already starting with excellence.
-
-Happy brewing!
-    `,
-  },
+interface MultiLang {
+  en: string
+  bn?: string
+  ar?: string
 }
 
-export function generateStaticParams() {
-  return Object.keys(blogData).map((slug) => ({ slug }))
+interface Blog {
+  _id: string
+  title: MultiLang
+  slug: string
+  thumbnail: string
+  excerpt: MultiLang
+  category: MultiLang
+  content: MultiLang
+  isHidden: boolean
+  createdAt: string
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = blogData[params.slug as keyof typeof blogData]
-  
-  if (!post) {
-    return {
-      title: 'Article Not Found - Zen Tea Blog',
+export default function BlogPostPage() {
+  const params = useParams<{ slug: string }>()
+  const { t, language } = useLanguage()
+  const [blog, setBlog] = useState<Blog | null>(null)
+  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([])
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      setNotFound(false)
+
+      try {
+        // Fetch current blog
+        const res = await fetch(`/api/blogs/slug/${params.slug}`)
+        if (!res.ok) {
+          setNotFound(true)
+          return
+        }
+        const blogData: Blog = await res.json()
+        setBlog(blogData)
+
+        // Fetch all blogs for related articles
+        const allRes = await fetch('/api/blogs')
+        if (allRes.ok) {
+          const allBlogs: Blog[] = await allRes.json()
+          const related = allBlogs
+            .filter((b) => b.slug !== params.slug && !b.isHidden)
+            .slice(0, 3)
+          setRelatedBlogs(related)
+        }
+      } catch {
+        setNotFound(true)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    if (params.slug) {
+      fetchData()
+    }
+  }, [params.slug])
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    )
   }
 
-  return {
-    title: `${post.title} - Zen Tea Blog`,
-    description: post.content.substring(0, 160),
+  // Not found state
+  if (notFound || !blog) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
+        <h1 className="mb-4 font-serif text-4xl font-bold text-foreground">
+          {t({ en: 'Article Not Found', bn: 'নিবন্ধ পাওয়া যায়নি', ar: 'المقال غير موجود' })}
+        </h1>
+        <p className="mb-8 text-lg text-muted-foreground">
+          {t({
+            en: 'The blog post you are looking for does not exist or has been removed.',
+            bn: 'আপনি যে ব্লগ পোস্টটি খুঁজছেন তা বিদ্যমান নেই বা সরানো হয়েছে।',
+            ar: 'مقال المدونة الذي تبحث عنه غير موجود أو تمت إزالته.',
+          })}
+        </p>
+        <Link
+          href="/blogs"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-dark"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t({ en: 'Back to Blog', bn: 'ব্লগে ফিরে যান', ar: 'العودة إلى المدونة' })}
+        </Link>
+      </div>
+    )
   }
-}
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = blogData[params.slug as keyof typeof blogData]
-
-  if (!post) {
-    notFound()
-  }
+  const formattedDate = new Date(blog.createdAt).toLocaleDateString(
+    language === 'bn' ? 'bn-BD' : language === 'ar' ? 'ar-SA' : 'en-US',
+    { year: 'numeric', month: 'long', day: 'numeric' }
+  )
 
   return (
     <>
@@ -178,131 +117,119 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Blog
+            {t({ en: 'Back to Blog', bn: 'ব্লগে ফিরে যান', ar: 'العودة إلى المدونة' })}
           </Link>
         </div>
       </div>
 
-      {/* Article Hero */}
-      <article className="py-12">
+      <article className="py-8 md:py-12">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
-          {/* Meta Info */}
-          <div className="mb-6">
-            <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold text-primary-dark">
-              {post.category}
-            </span>
-          </div>
+          {/* Featured Image */}
+          {blog.thumbnail && (
+            <div className="mb-8 overflow-hidden rounded-xl shadow-lg">
+              <img
+                src={blog.thumbnail}
+                alt={t(blog.title)}
+                className="h-auto w-full object-cover"
+              />
+            </div>
+          )}
+
+          {/* Category Badge */}
+          {t(blog.category) && (
+            <div className="mb-4">
+              <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold text-primary-dark">
+                {t(blog.category)}
+              </span>
+            </div>
+          )}
 
           {/* Title */}
-          <h1 className="mb-6 font-serif text-4xl font-bold text-foreground lg:text-5xl">
-            {post.title}
+          <h1 className="mb-4 font-serif text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
+            {t(blog.title)}
           </h1>
 
-          {/* Meta Details */}
-          <div className="mb-8 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              {new Date(post.date).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              {post.readTime}
-            </span>
-            <button className="ml-auto flex items-center gap-2 text-primary hover:underline">
-              <Share2 className="h-4 w-4" />
-              Share
-            </button>
+          {/* Date */}
+          <div className="mb-8 flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <time dateTime={blog.createdAt}>{formattedDate}</time>
           </div>
 
-          {/* Featured Image */}
-          <div className="mb-12 overflow-hidden rounded-lg">
-            <img
-              src={post.image || "/placeholder.svg"}
-              alt={post.title}
-              className="h-full w-full object-cover"
-            />
-          </div>
+          {/* Divider */}
+          <hr className="mb-8 border-border" />
 
-          {/* Content */}
-          <div className="prose prose-lg max-w-none">
-            {post.content.split('\n\n').map((paragraph, idx) => {
-              if (paragraph.startsWith('## ')) {
-                return (
-                  <h2 key={idx} className="mb-4 mt-8 font-serif text-2xl font-bold text-foreground">
-                    {paragraph.replace('## ', '')}
-                  </h2>
-                )
-              }
-              if (paragraph.startsWith('### ')) {
-                return (
-                  <h3 key={idx} className="mb-3 mt-6 font-serif text-xl font-bold text-foreground">
-                    {paragraph.replace('### ', '')}
-                  </h3>
-                )
-              }
-              return (
-                <p key={idx} className="mb-4 leading-relaxed text-muted-foreground">
-                  {paragraph}
-                </p>
-              )
-            })}
-          </div>
+          {/* Content rendered as HTML */}
+          <div
+            className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground prose-img:rounded-lg"
+            dangerouslySetInnerHTML={{ __html: t(blog.content) }}
+          />
 
           {/* CTA */}
-          <div className="mt-12 rounded-lg border-2 border-primary bg-primary/5 p-8">
+          <div className="mt-12 rounded-xl border-2 border-primary bg-primary/5 p-8">
             <h3 className="mb-2 font-serif text-2xl font-bold text-foreground">
-              Experience Zen Tea
+              {t({ en: 'Experience Zen Tea', bn: 'জেন টি অনুভব করুন', ar: 'تجربة شاي زن' })}
             </h3>
             <p className="mb-6 text-muted-foreground">
-              Discover our premium tea collection crafted from the finest Bangladeshi tea gardens.
+              {t({
+                en: 'Discover our premium tea collection crafted from the finest Bangladeshi tea gardens.',
+                bn: 'বাংলাদেশের সেরা চা বাগান থেকে তৈরি আমাদের প্রিমিয়াম চা সংগ্রহ আবিষ্কার করুন।',
+                ar: 'اكتشف مجموعة الشاي الممتازة المصنوعة من أفضل حدائق الشاي في بنغلاديش.',
+              })}
             </p>
             <Link
               href="/products"
               className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary-dark"
             >
-              Explore Our Products
+              {t({ en: 'Explore Our Products', bn: 'আমাদের পণ্য দেখুন', ar: 'استكشف منتجاتنا' })}
             </Link>
           </div>
         </div>
       </article>
 
       {/* Related Articles */}
-      <section className="border-t border-border bg-muted py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="mb-8 font-serif text-3xl font-bold text-foreground">
-            Related Articles
-          </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            {Object.entries(blogData)
-              .filter(([slug]) => slug !== params.slug)
-              .slice(0, 3)
-              .map(([slug, relatedPost]) => (
+      {relatedBlogs.length > 0 && (
+        <section className="border-t border-border bg-muted py-16">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <h2 className="mb-8 font-serif text-3xl font-bold text-foreground">
+              {t({ en: 'Related Articles', bn: 'সম্পর্কিত নিবন্ধ', ar: 'مقالات ذات صلة' })}
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+              {relatedBlogs.map((related) => (
                 <Link
-                  key={slug}
-                  href={`/blogs/${slug}`}
+                  key={related._id || related.slug}
+                  href={`/blogs/${related.slug}`}
                   className="group overflow-hidden rounded-lg border border-border bg-card shadow transition-all hover:shadow-lg"
                 >
-                  <div className="aspect-video overflow-hidden">
-                    <img
-                      src={relatedPost.image || "/placeholder.svg"}
-                      alt={relatedPost.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
+                  {related.thumbnail && (
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={related.thumbnail}
+                        alt={t(related.title)}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
                   <div className="p-4">
+                    {t(related.category) && (
+                      <span className="mb-2 inline-block rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-primary-dark">
+                        {t(related.category)}
+                      </span>
+                    )}
                     <h3 className="font-serif text-lg font-bold text-foreground group-hover:text-primary">
-                      {relatedPost.title}
+                      {t(related.title)}
                     </h3>
+                    {t(related.excerpt) && (
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                        {t(related.excerpt)}
+                      </p>
+                    )}
                   </div>
                 </Link>
               ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </>
   )
 }
