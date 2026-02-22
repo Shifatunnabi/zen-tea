@@ -1,11 +1,24 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Mail, Phone } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
 
 export function Footer() {
   const { t } = useLanguage()
+  const [settings, setSettings] = useState<any>(null)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => setSettings(data))
+      .catch(() => {})
+  }, [])
+
+  const phone = settings?.phone || '088 01711-633202'
+  const email = settings?.email || 'zenteabd@gmail.com'
+  const location = settings?.location?.en || 'Jaljalpur, Sagardighi, Ghatail, Tangail'
 
   return (
     <footer className="border-t border-border bg-primary-dark text-white">
@@ -55,11 +68,11 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-white/80">
                 <Phone className="h-4 w-4" />
-                <span>088 01711-633202</span>
+                <span>{phone}</span>
               </li>
               <li className="flex items-center gap-2 text-white/80">
                 <Mail className="h-4 w-4" />
-                <span>zenteabd@gmail.com</span>
+                <span>{email}</span>
               </li>
             </ul>
             <p className="mt-4 text-sm text-white/80">
@@ -68,7 +81,7 @@ export function Footer() {
                 bn: 'অথেন্টিক টি ট্রেডার্স',
                 ar: 'تجار الشاي الأصليون'
               })}<br />
-              Jaljalpur, Sagardighi, Ghatail, Tangail
+              {settings?.location ? t(settings.location) : location}
             </p>
           </div>
         </div>

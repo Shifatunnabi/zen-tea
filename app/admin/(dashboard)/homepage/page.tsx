@@ -91,33 +91,53 @@ export default function AdminHomepage() {
   const saveSlide = async (slide: CarouselSlide, i: number) => {
     setSaving(`slide-${i}`)
     try {
+      let res
       if (slide._id) {
-        const res = await fetch(`/api/carousel/${slide._id}`, {
+        res = await fetch(`/api/carousel/${slide._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(slide),
         })
-        const data = await res.json()
-        updateSlide(i, data)
       } else {
-        const res = await fetch('/api/carousel', {
+        res = await fetch('/api/carousel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(slide),
         })
-        const data = await res.json()
-        updateSlide(i, data)
       }
-    } catch {}
-    setSaving(null)
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to save slide')
+      }
+      
+      const data = await res.json()
+      updateSlide(i, data)
+      alert('Slide saved successfully!')
+    } catch (error) {
+      console.error('Save slide error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save slide')
+    } finally {
+      setSaving(null)
+    }
   }
 
   const deleteSlide = async (slide: CarouselSlide, i: number) => {
     if (!confirm('Delete this slide?')) return
-    if (slide._id) {
-      await fetch(`/api/carousel/${slide._id}`, { method: 'DELETE' })
+    try {
+      if (slide._id) {
+        const res = await fetch(`/api/carousel/${slide._id}`, { method: 'DELETE' })
+        if (!res.ok) {
+          const error = await res.json()
+          throw new Error(error.error || 'Failed to delete slide')
+        }
+      }
+      setSlides(slides.filter((_, idx) => idx !== i))
+      alert('Slide deleted successfully!')
+    } catch (error) {
+      console.error('Delete slide error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete slide')
     }
-    setSlides(slides.filter((_, idx) => idx !== i))
   }
 
   /* ─── Core Values CRUD ─── */
@@ -132,33 +152,53 @@ export default function AdminHomepage() {
   const saveCoreValue = async (cv: CoreValue, i: number) => {
     setSaving(`cv-${i}`)
     try {
+      let res
       if (cv._id) {
-        const res = await fetch(`/api/core-values/${cv._id}`, {
+        res = await fetch(`/api/core-values/${cv._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cv),
         })
-        const data = await res.json()
-        updateCoreValue(i, data)
       } else {
-        const res = await fetch('/api/core-values', {
+        res = await fetch('/api/core-values', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(cv),
         })
-        const data = await res.json()
-        updateCoreValue(i, data)
       }
-    } catch {}
-    setSaving(null)
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to save core value')
+      }
+      
+      const data = await res.json()
+      updateCoreValue(i, data)
+      alert('Core value saved successfully!')
+    } catch (error) {
+      console.error('Save core value error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save core value')
+    } finally {
+      setSaving(null)
+    }
   }
 
   const deleteCoreValue = async (cv: CoreValue, i: number) => {
     if (!confirm('Delete this core value?')) return
-    if (cv._id) {
-      await fetch(`/api/core-values/${cv._id}`, { method: 'DELETE' })
+    try {
+      if (cv._id) {
+        const res = await fetch(`/api/core-values/${cv._id}`, { method: 'DELETE' })
+        if (!res.ok) {
+          const error = await res.json()
+          throw new Error(error.error || 'Failed to delete core value')
+        }
+      }
+      setCoreValues(coreValues.filter((_, idx) => idx !== i))
+      alert('Core value deleted successfully!')
+    } catch (error) {
+      console.error('Delete core value error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete core value')
     }
-    setCoreValues(coreValues.filter((_, idx) => idx !== i))
   }
 
   /* ─── Heritage save ─── */
@@ -170,10 +210,21 @@ export default function AdminHomepage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(heritage),
       })
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to save heritage')
+      }
+      
       const data = await res.json()
       setHeritage(data)
-    } catch {}
-    setSaving(null)
+      alert('Heritage section saved successfully!')
+    } catch (error) {
+      console.error('Save heritage error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save heritage section')
+    } finally {
+      setSaving(null)
+    }
   }
 
   if (loading) {

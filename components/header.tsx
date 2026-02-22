@@ -2,14 +2,25 @@
 
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useLanguage } from '@/lib/language-context'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [logo, setLogo] = useState<string>('')
   const { t } = useLanguage()
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.logo) setLogo(data.logo)
+      })
+      .catch(() => {})
+  }, [])
 
   const navigation = [
     { name: t({ en: 'Home', bn: 'হোম', ar: 'الرئيسية' }), href: '/' },
@@ -20,11 +31,15 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur">
         <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
           <div className="flex lg:flex-1">
-            <Link href="/" className="-m-1.5 p-1.5">
-              <span className="font-serif text-2xl font-bold text-primary">Zen Tea</span>
+            <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
+              {logo ? (
+                <Image src={logo} alt="Zen Tea" width={120} height={40} className="h-10 w-auto" />
+              ) : (
+                <span className="font-serif text-2xl font-bold text-primary">Zen Tea</span>
+              )}
             </Link>
           </div>
           
@@ -78,7 +93,11 @@ export function Header() {
         <div className="flex flex-col h-full px-6 py-6">
           <div className="flex items-center justify-between">
             <Link href="/" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-              <span className="font-serif text-2xl font-bold text-white">Zen Tea</span>
+              {logo ? (
+                <Image src={logo} alt="Zen Tea" width={120} height={40} className="h-10 w-auto" />
+              ) : (
+                <span className="font-serif text-2xl font-bold text-white">Zen Tea</span>
+              )}
             </Link>
             <button
               type="button"

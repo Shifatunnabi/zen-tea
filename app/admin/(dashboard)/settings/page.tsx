@@ -78,17 +78,32 @@ export default function AdminSettingsPage() {
   const saveSettings = async () => {
     setSavingSettings(true)
     try {
-      await fetch('/api/settings', {
+      const res = await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),
       })
-    } catch {}
-    setSavingSettings(false)
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to save settings')
+      }
+      
+      alert('Settings saved successfully!')
+    } catch (error) {
+      console.error('Save settings error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save settings')
+    } finally {
+      setSavingSettings(false)
+    }
   }
 
   const createAdmin = async () => {
-    if (!newAdmin.email || !newAdmin.password) return alert('Email and password are required')
+    if (!newAdmin.email || !newAdmin.password) {
+      alert('Email and password are required')
+      return
+    }
+    
     setSavingAdmin(true)
     try {
       const res = await fetch('/api/admins', {
@@ -96,21 +111,39 @@ export default function AdminSettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAdmin),
       })
-      if (res.ok) {
-        setNewAdmin({ name: '', email: '', password: '', role: 'admin' })
-        loadData()
-      } else {
-        const data = await res.json()
-        alert(data.error || 'Failed to create admin')
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to create admin')
       }
-    } catch {}
-    setSavingAdmin(false)
+      
+      setNewAdmin({ name: '', email: '', password: '', role: 'admin' })
+      await loadData()
+      alert('Admin created successfully!')
+    } catch (error) {
+      console.error('Create admin error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to create admin')
+    } finally {
+      setSavingAdmin(false)
+    }
   }
 
   const deleteAdmin = async (admin: Admin) => {
     if (!confirm(`Delete admin "${admin.email}"?`)) return
-    await fetch(`/api/admins/${admin._id}`, { method: 'DELETE' })
-    loadData()
+    try {
+      const res = await fetch(`/api/admins/${admin._id}`, { method: 'DELETE' })
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to delete admin')
+      }
+      
+      await loadData()
+      alert('Admin deleted successfully!')
+    } catch (error) {
+      console.error('Delete admin error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete admin')
+    }
   }
 
   if (loading) {

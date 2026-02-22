@@ -205,7 +205,7 @@ export default function ProductsPage() {
                           <ul className="space-y-2">
                             {product.keyFeatures.map((feature, idx) => (
                               <li key={idx} className="flex items-start gap-2 text-muted-foreground">
-                                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                                 <span>{t(feature)}</span>
                               </li>
                             ))}

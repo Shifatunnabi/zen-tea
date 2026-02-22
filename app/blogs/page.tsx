@@ -1,118 +1,111 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Calendar, Clock, ArrowRight } from 'lucide-react'
+import { Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
+
+interface Blog {
+  _id: string
+  title: { en: string; bn: string; ar: string }
+  slug: string
+  thumbnail: string
+  excerpt: { en: string; bn: string; ar: string }
+  category: { en: string; bn: string; ar: string }
+  content: { en: string; bn: string; ar: string }
+  isHidden: boolean
+  createdAt: string
+}
+
+const FALLBACK_BLOGS: Blog[] = [
+  {
+    _id: 'fallback-1',
+    slug: 'health-benefits-black-tea',
+    title: { 
+      en: 'The Health Benefits of Black Tea: Why It\'s Good for You', 
+      bn: 'কালো চায়ের স্বাস্থ্য উপকারিতা: কেন এটি আপনার জন্য ভাল', 
+      ar: 'الفوائد الصحية للشاي الأسود: لماذا هو جيد لك' 
+    },
+    excerpt: { 
+      en: 'Discover the science-backed health benefits of black tea, from antioxidants to heart health and mental clarity.', 
+      bn: 'অ্যান্টিঅক্সিড্যান্ট থেকে হৃদযন্ত্রের স্বাস্থ্য এবং মানসিক স্বচ্ছতা পর্যন্ত কালো চায়ের বিজ্ঞান-সমর্থিত স্বাস্থ্য উপকারিতা আবিষ্কার করুন।', 
+      ar: 'اكتشف الفوائد الصحية للشاي الأسود المدعومة بالعلم، من مضادات الأكسدة إلى صحة القلب والوضوح العقلي.' 
+    },
+    thumbnail: '/placeholder.svg?height=400&width=600',
+    createdAt: '2024-01-15',
+    category: { en: 'Health & Wellness', bn: 'স্বাস্থ্য ও সুস্থতা', ar: 'الصحة والعافية' },
+    content: { en: '', bn: '', ar: '' },
+    isHidden: false
+  },
+  {
+    _id: 'fallback-2',
+    slug: 'bangladesh-tea-heritage',
+    title: { 
+      en: 'The Rich Heritage of Bangladeshi Tea Gardens', 
+      bn: 'বাংলাদেশী চা বাগানের সমৃদ্ধ ঐতিহ্য', 
+      ar: 'التراث الغني لحدائق الشاي البنغلاديشية' 
+    },
+    excerpt: { 
+      en: 'Journey through the lush tea estates of Sylhet, Sreemangal, and Panchagarh—the heartland of Bangladesh\'s tea culture.', 
+      bn: 'সিলেট, শ্রীমঙ্গল এবং পঞ্চগড়ের সবুজ চা এস্টেট দিয়ে যাত্রা করুন—বাংলাদেশের চা সংস্কৃতির হৃদয়ভূমি।', 
+      ar: 'رحلة عبر مزارع الشاي الخضراء في سيلهت وسريمانغال وبانشاغار - قلب ثقافة الشاي في بنغلاديش.' 
+    },
+    thumbnail: '/placeholder.svg?height=400&width=600',
+    createdAt: '2024-01-10',
+    category: { en: 'Heritage', bn: 'ঐতিহ্য', ar: 'تراث' },
+    content: { en: '', bn: '', ar: '' },
+    isHidden: false
+  },
+  {
+    _id: 'fallback-3',
+    slug: 'perfect-cup-brewing-guide',
+    title: { 
+      en: 'How to Brew the Perfect Cup of Tea: A Complete Guide', 
+      bn: 'কিভাবে নিখুঁত কাপ চা তৈরি করবেন: একটি সম্পূর্ণ নির্দেশিকা', 
+      ar: 'كيفية تحضير كوب الشاي المثالي: دليل كامل' 
+    },
+    excerpt: { 
+      en: 'Master the art of tea brewing with our comprehensive guide covering water temperature, steeping time, and more.', 
+      bn: 'জলের তাপমাত্রা, স্টিপিং সময় এবং আরও অনেক কিছু কভার করে আমাদের ব্যাপক গাইড সহ চা তৈরির শিল্পে দক্ষতা অর্জন করুন।', 
+      ar: 'إتقان فن تحضير الشاي مع دليلنا الشامل الذي يغطي درجة حرارة الماء ووقت النقع والمزيد.' 
+    },
+    thumbnail: '/placeholder.svg?height=400&width=600',
+    createdAt: '2024-01-05',
+    category: { en: 'Brewing Tips', bn: 'ব্রিউইং টিপস', ar: 'نصائح التحضير' },
+    content: { en: '', bn: '', ar: '' },
+    isHidden: false
+  }
+]
 
 export default function BlogsPage() {
   const { t } = useLanguage()
-  
-  const blogPosts = [
-    {
-      slug: 'health-benefits-black-tea',
-      title: t({ 
-        en: 'The Health Benefits of Black Tea: Why It\'s Good for You', 
-        bn: 'কালো চায়ের স্বাস্থ্য উপকারিতা: কেন এটি আপনার জন্য ভাল', 
-        ar: 'الفوائد الصحية للشاي الأسود: لماذا هو جيد لك' 
-      }),
-      excerpt: t({ 
-        en: 'Discover the science-backed health benefits of black tea, from antioxidants to heart health and mental clarity.', 
-        bn: 'অ্যান্টিঅক্সিড্যান্ট থেকে হৃদযন্ত্রের স্বাস্থ্য এবং মানসিক স্বচ্ছতা পর্যন্ত কালো চায়ের বিজ্ঞান-সমর্থিত স্বাস্থ্য উপকারিতা আবিষ্কার করুন।', 
-        ar: 'اكتشف الفوائد الصحية للشاي الأسود المدعومة بالعلم، من مضادات الأكسدة إلى صحة القلب والوضوح العقلي.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2024-01-15',
-      readTime: t({ en: '5 min read', bn: '৫ মিনিট পড়া', ar: '5 دقائق قراءة' }),
-      category: t({ en: 'Health & Wellness', bn: 'স্বাস্থ্য ও সুস্থতা', ar: 'الصحة والعافية' }),
-    },
-    {
-      slug: 'bangladesh-tea-heritage',
-      title: t({ 
-        en: 'The Rich Heritage of Bangladeshi Tea Gardens', 
-        bn: 'বাংলাদেশী চা বাগানের সমৃদ্ধ ঐতিহ্য', 
-        ar: 'التراث الغني لحدائق الشاي البنغلاديشية' 
-      }),
-      excerpt: t({ 
-        en: 'Journey through the lush tea estates of Sylhet, Sreemangal, and Panchagarh—the heartland of Bangladesh\'s tea culture.', 
-        bn: 'সিলেট, শ্রীমঙ্গল এবং পঞ্চগড়ের সবুজ চা এস্টেট দিয়ে যাত্রা করুন—বাংলাদেশের চা সংস্কৃতির হৃদয়ভূমি।', 
-        ar: 'رحلة عبر مزارع الشاي الخضراء في سيلهت وسريمانغال وبانشاغار - قلب ثقافة الشاي في بنغلاديش.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2024-01-10',
-      readTime: t({ en: '7 min read', bn: '৭ মিনিট পড়া', ar: '7 دقائق قراءة' }),
-      category: t({ en: 'Heritage', bn: 'ঐতিহ্য', ar: 'تراث' }),
-    },
-    {
-      slug: 'perfect-cup-brewing-guide',
-      title: t({ 
-        en: 'How to Brew the Perfect Cup of Tea: A Complete Guide', 
-        bn: 'কিভাবে নিখুঁত কাপ চা তৈরি করবেন: একটি সম্পূর্ণ নির্দেশিকা', 
-        ar: 'كيفية تحضير كوب الشاي المثالي: دليل كامل' 
-      }),
-      excerpt: t({ 
-        en: 'Master the art of tea brewing with our comprehensive guide covering water temperature, steeping time, and more.', 
-        bn: 'জলের তাপমাত্রা, স্টিপিং সময় এবং আরও অনেক কিছু কভার করে আমাদের ব্যাপক গাইড সহ চা তৈরির শিল্পে দক্ষতা অর্জন করুন।', 
-        ar: 'إتقان فن تحضير الشاي مع دليلنا الشامل الذي يغطي درجة حرارة الماء ووقت النقع والمزيد.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2024-01-05',
-      readTime: t({ en: '6 min read', bn: '৬ মিনিট পড়া', ar: '6 دقائق قراءة' }),
-      category: t({ en: 'Brewing Tips', bn: 'ব্রিউইং টিপস', ar: 'نصائح التحضير' }),
-    },
-    {
-      slug: 'tea-trade-bangladesh',
-      title: t({ 
-        en: 'The Global Journey of Bangladeshi Tea', 
-        bn: 'বাংলাদেশী চায়ের বৈশ্বিক যাত্রা', 
-        ar: 'الرحلة العالمية للشاي البنغلاديشي' 
-      }),
-      excerpt: t({ 
-        en: 'Learn how Bangladesh\'s premium tea reaches international markets and the role of B2B partnerships in global tea trade.', 
-        bn: 'জানুন কিভাবে বাংলাদেশের প্রিমিয়াম চা আন্তর্জাতিক বাজারে পৌঁছায় এবং বৈশ্বিক চা বাণিজ্যে B2B অংশীদারিত্বের ভূমিকা।', 
-        ar: 'تعرف على كيفية وصول الشاي الممتاز من بنغلاديش إلى الأسواق الدولية ودور شراكات B2B في تجارة الشاي العالمية.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2023-12-28',
-      readTime: t({ en: '8 min read', bn: '৮ মিনিট পড়া', ar: '8 دقائق قراءة' }),
-      category: t({ en: 'Industry', bn: 'শিল্প', ar: 'صناعة' }),
-    },
-    {
-      slug: 'sustainability-tea-production',
-      title: t({ 
-        en: 'Sustainable Tea Production: Our Commitment to the Environment', 
-        bn: 'টেকসই চা উৎপাদন: পরিবেশের প্রতি আমাদের প্রতিশ্রুতি', 
-        ar: 'إنتاج الشاي المستدام: التزامنا تجاه البيئة' 
-      }),
-      excerpt: t({ 
-        en: 'Explore our ethical practices in tea cultivation, from organic farming to fair labor and environmental conservation.', 
-        bn: 'জৈব কৃষি থেকে ন্যায্য শ্রম এবং পরিবেশ সংরক্ষণ পর্যন্ত চা চাষে আমাদের নৈতিক অনুশীলন অন্বেষণ করুন।', 
-        ar: 'استكشف ممارساتنا الأخلاقية في زراعة الشاي، من الزراعة العضوية إلى العمل العادل والحفاظ على البيئة.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2023-12-20',
-      readTime: t({ en: '5 min read', bn: '৫ মিনিট পড়া', ar: '5 دقائق قراءة' }),
-      category: t({ en: 'Sustainability', bn: 'স্থায়িত্ব', ar: 'الاستدامة' }),
-    },
-    {
-      slug: 'tea-culture-bangladesh',
-      title: t({ 
-        en: 'Tea Culture in Bangladesh: More Than Just a Beverage', 
-        bn: 'বাংলাদেশে চা সংস্কৃতি: শুধু একটি পানীয়ের চেয়ে বেশি', 
-        ar: 'ثقافة الشاي في بنغلاديش: أكثر من مجرد مشروب' 
-      }),
-      excerpt: t({ 
-        en: 'Tea is woven into the social fabric of Bangladesh. Discover how chai brings communities together across the country.', 
-        bn: 'চা বাংলাদেশের সামাজিক কাঠামোতে বোনা। আবিষ্কার করুন কিভাবে চা সারা দেশে সম্প্রদায়কে একত্রিত করে।', 
-        ar: 'الشاي منسوج في النسيج الاجتماعي لبنغلاديش. اكتشف كيف يجمع الشاي المجتمعات في جميع أنحاء البلاد.' 
-      }),
-      image: '/placeholder.svg?height=400&width=600',
-      date: '2023-12-15',
-      readTime: t({ en: '6 min read', bn: '৬ মিনিট পড়া', ar: '6 دقائق قراءة' }),
-      category: t({ en: 'Culture', bn: 'সংস্কৃতি', ar: 'ثقافة' }),
-    },
-  ]
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
-  const categories = Array.from(new Set(blogPosts.map(post => post.category)))
+  useEffect(() => {
+    setLoading(true)
+    fetch('/api/blogs')
+      .then(r => r.json())
+      .then(data => {
+        const visibleBlogs = (data || []).filter((b: Blog) => !b.isHidden)
+        setBlogs(visibleBlogs.length > 0 ? visibleBlogs : FALLBACK_BLOGS)
+      })
+      .catch(() => setBlogs(FALLBACK_BLOGS))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const categories = Array.from(new Set(blogs.map(blog => t(blog.category))))
+  const filteredBlogs = selectedCategory === 'all' 
+    ? blogs 
+    : blogs.filter(blog => t(blog.category) === selectedCategory)
+
+  const calculateReadTime = (content: string) => {
+    const wordsPerMinute = 200
+    const wordCount = content.split(/\s+/).length
+    const minutes = Math.ceil(wordCount / wordsPerMinute)
+    return t({ en: `${minutes} min read`, bn: `${minutes} মিনিট পড়া`, ar: `${minutes} دقائق قراءة` })
+  }
 
   return (
     <>
@@ -138,13 +131,25 @@ export default function BlogsPage() {
       <section className="border-b border-border bg-muted py-6">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="flex flex-wrap gap-3">
-            <button className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-dark">
+            <button 
+              onClick={() => setSelectedCategory('all')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                selectedCategory === 'all'
+                  ? 'bg-primary text-white'
+                  : 'border border-border bg-card text-foreground hover:border-primary hover:bg-primary/5'
+              }`}
+            >
               {t({ en: 'All Posts', bn: 'সব পোস্ট', ar: 'جميع المنشورات' })}
             </button>
             {categories.map((category) => (
               <button
                 key={category}
-                className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-primary/5"
+                onClick={() => setSelectedCategory(category)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-primary text-white'
+                    : 'border border-border bg-card text-foreground hover:border-primary hover:bg-primary/5'
+                }`}
               >
                 {category}
               </button>
@@ -156,48 +161,69 @@ export default function BlogsPage() {
       {/* Blog Posts Grid */}
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post) => (
-              <article
-                key={post.slug}
-                className="group overflow-hidden rounded-lg border border-border bg-card shadow-md transition-all hover:shadow-xl"
-              >
-                <Link href={`/blogs/${post.slug}`}>
-                  <div className="aspect-video overflow-hidden">
-                    <img
-                      src={post.image || "/placeholder.svg"}
-                      alt={post.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="mb-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-semibold text-primary-dark">
-                      {post.category}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filteredBlogs.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-lg text-muted-foreground">
+                {t({ en: 'No blog posts available.', bn: 'কোন ব্লগ পোস্ট উপলব্ধ নেই।', ar: 'لا توجد مشاركات مدونة متاحة.' })}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {filteredBlogs.map((post) => (
+                <article
+                  key={post._id}
+                  className="group overflow-hidden rounded-lg border border-border bg-card shadow-md transition-all hover:shadow-xl"
+                >
+                  <Link href={`/blogs/${post.slug}`}>
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={post.thumbnail || "/placeholder.svg?height=400&width=600"}
+                        alt={t(post.title)}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
                     </div>
-                    <h2 className="mb-3 font-serif text-xl font-bold text-foreground group-hover:text-primary">
-                      {post.title}
-                    </h2>
-                    <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {new Date(post.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {post.readTime}
-                        </span>
+                    <div className="p-6">
+                      <div className="mb-3 inline-block rounded-full bg-accent px-3 py-1 text-xs font-semibold text-primary-dark">
+                        {t(post.category)}
                       </div>
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      <h2 className="mb-3 font-serif text-xl font-bold text-foreground group-hover:text-primary">
+                        {t(post.title)}
+                      </h2>
+                      <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                        {t(post.excerpt)}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <div className="flex items-center gap-4">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(post.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {calculateReadTime(t(post.content))}
+                          </span>
+                        </div>
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </div>
                     </div>
-                  </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
                 </Link>
               </article>
             ))}

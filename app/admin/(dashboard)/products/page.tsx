@@ -457,39 +457,74 @@ export default function AdminProductsPage() {
   const handleSave = async (product: Product) => {
     setSaving(true)
     try {
+      let res
       if (product._id) {
-        await fetch(`/api/products/${product._id}`, {
+        res = await fetch(`/api/products/${product._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(product),
         })
       } else {
-        await fetch('/api/products', {
+        res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(product),
         })
       }
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to save product')
+      }
+      
       setEditing(null)
-      loadProducts()
-    } catch {}
-    setSaving(false)
+      await loadProducts()
+      alert('Product saved successfully!')
+    } catch (error) {
+      console.error('Save error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to save product')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleToggleHide = async (product: Product) => {
     if (!product._id) return
-    await fetch(`/api/products/${product._id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...product, isHidden: !product.isHidden }),
-    })
-    loadProducts()
+    try {
+      const res = await fetch(`/api/products/${product._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...product, isHidden: !product.isHidden }),
+      })
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to update visibility')
+      }
+      
+      await loadProducts()
+    } catch (error) {
+      console.error('Toggle hide error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to update visibility')
+    }
   }
 
   const handleDelete = async (product: Product) => {
     if (!product._id || !confirm('Delete this product?')) return
-    await fetch(`/api/products/${product._id}`, { method: 'DELETE' })
-    loadProducts()
+    try {
+      const res = await fetch(`/api/products/${product._id}`, { method: 'DELETE' })
+      
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to delete product')
+      }
+      
+      await loadProducts()
+      alert('Product deleted successfully!')
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to delete product')
+    }
   }
 
   if (loading) {

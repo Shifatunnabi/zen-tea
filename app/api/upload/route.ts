@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
-import { existsSync } from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,16 +20,16 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
+    // Convert buffer to base64
+    const base64File = `data:${file.type};base64,${buffer.toString('base64')}`
 
-    const uniqueName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-    const filePath = path.join(uploadDir, uniqueName)
-    await writeFile(filePath, buffer)
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(base64File, {
+      folder: 'zen-tea',
+      resource_type: 'auto', // Automatically detect file type (image/video)
+    })
 
-    return NextResponse.json({ url: `/uploads/${uniqueName}` })
+    return NextResponse.json({ url: result.secure_url })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
