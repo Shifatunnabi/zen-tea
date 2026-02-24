@@ -38,7 +38,7 @@ export function ProductCard({ name, description, image, hoverImage, slug }: Prod
         <h3 className="mb-2 font-serif text-2xl font-bold text-foreground">
           {name}
         </h3>
-        <p className="text-sm leading-relaxed text-muted-foreground">
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
           {description}
         </p>
         <div className="mt-4 flex items-center text-primary font-semibold group-hover:underline">

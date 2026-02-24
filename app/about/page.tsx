@@ -95,13 +95,13 @@ export default function AboutPage() {
       <section className="relative overflow-hidden bg-primary-dark py-20 text-white lg:py-32">
         <div className="absolute inset-0">
           <img
-            src="/placeholder.svg?height=800&width=1600"
+            src="/hero_bg.jpg?height=800&width=1600"
             alt={t({ en: 'Our heritage', bn: 'আমাদের ঐতিহ্য', ar: 'تراثنا' })}
-            className="h-full w-full object-cover opacity-20"
+            className="h-full w-full object-cover opacity-50"
           />
         </div>
         <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h1 className="mb-6 font-serif text-5xl font-bold lg:text-6xl">
+          <h1 className="mb-6 font-serif text-2xl sm:text-4xl lg:text-6xl font-bold">
             {t({ en: 'Our Story', bn: 'আমাদের গল্প', ar: 'قصتنا' })}
           </h1>
           <p className="text-xl leading-relaxed text-white/90 lg:text-2xl">
@@ -141,7 +141,7 @@ export default function AboutPage() {
       <section className="bg-primary-dark py-20 text-white">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="mb-4 font-serif text-4xl font-bold">
+            <h2 className="mb-4 font-serif text-xl sm:text-2xl lg:text-4xl font-bold">
               {t({ en: 'Our Journey', bn: 'আমাদের যাত্রা', ar: 'رحلتنا' })}
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-white/80">
@@ -168,7 +168,7 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mb-12 text-center">
-            <h2 className="mb-4 font-serif text-4xl font-bold text-foreground">
+            <h2 className="mb-4 font-serif text-xl sm:text-2xl lg:text-4xl font-bold text-foreground">
               {t({ en: 'Who We Serve', bn: 'আমরা কাদের সেবা করি', ar: 'من نخدم' })}
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
@@ -210,7 +210,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="order-2 lg:order-1">
-              <h2 className="mb-6 font-serif text-4xl font-bold text-foreground">
+              <h2 className="mb-6 font-serif text-xl sm:text-2xl lg:text-4xl font-bold text-foreground">
                 {t(artOfTeaHeadline)}
               </h2>
               {t(artOfTeaDescription)

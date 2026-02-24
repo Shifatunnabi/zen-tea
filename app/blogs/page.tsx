@@ -110,10 +110,17 @@ export default function BlogsPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-primary py-20 text-white lg:py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="mb-6 font-serif text-5xl font-bold lg:text-6xl">
+
+      <section className="relative overflow-hidden bg-primary-dark py-20 text-white lg:py-32">
+        <div className="absolute inset-0">
+          <img
+            src="/hero_bg.jpg?height=800&width=1600"
+            alt={t({ en: 'Our heritage', bn: 'আমাদের ঐতিহ্য', ar: 'تراثنا' })}
+            className="h-full w-full object-cover opacity-50"
+          />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
+          <h1 className="mb-6 font-serif text-2xl sm:text-4xl lg:text-6xl font-bold">
               {t({ en: 'Tea Stories & Insights', bn: 'চা গল্প এবং অন্তর্দৃষ্টি', ar: 'قصص ورؤى الشاي' })}
             </h1>
             <p className="text-xl leading-relaxed text-white/90">
@@ -123,7 +130,6 @@ export default function BlogsPage() {
                 ar: 'استكشف عالم الشاي من خلال مقالاتنا حول الثقافة والصحة والتراث وفن تحضير الكوب المثالي.' 
               })}
             </p>
-          </div>
         </div>
       </section>
 
@@ -219,15 +225,6 @@ export default function BlogsPage() {
               ))}
             </div>
           )}
-        </div>
-      </section>
-    </>
-  )
-}
-                </Link>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 

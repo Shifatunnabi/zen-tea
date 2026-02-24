@@ -135,11 +135,18 @@ export default function ProductsPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-primary py-20 text-white lg:py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="mb-6 font-serif text-5xl font-bold lg:text-6xl">
-              {t({ en: 'Our Product Collection', bn: 'আমাদের পণ্য সংগ্রহ', ar: 'مجموعة منتجاتنا' })}
+
+            <section className="relative overflow-hidden bg-primary-dark py-20 text-white lg:py-32">
+        <div className="absolute inset-0">
+          <img
+            src="/hero_bg.jpg?height=800&width=1600"
+            alt={t({ en: 'Our heritage', bn: 'আমাদের ঐতিহ্য', ar: 'تراثنا' })}
+            className="h-full w-full object-cover opacity-50"
+          />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
+          <h1 className="mb-6 font-serif text-2xl sm:text-4xl lg:text-6xl font-bold">
+              {t({ en: 'Our Products', bn: 'আমাদের পণ্যসমুহ', ar: 'مجموعة منتجاتنا' })}
             </h1>
             <p className="text-xl leading-relaxed text-white/90">
               {t({
@@ -148,9 +155,10 @@ export default function ProductsPage() {
                 ar: 'ثلاث خلطات مميزة مصنوعة من أفضل حدائق الشاي في بنغلاديش، كل منها يقدم تجربة طعم فريدة لشركاء الجملة وعشاق الشاي في جميع أنحاء العالم.',
               })}
             </p>
-          </div>
         </div>
       </section>
+
+
 
       {/* Products Grid */}
       <section className="py-20">
@@ -179,13 +187,13 @@ export default function ProductsPage() {
                     }`}
                   >
                     {/* Text Content */}
-                    <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
+                    <div className={`order-last lg:order-none ${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
                       {t(product.taglineTwo) && (
                         <div className="mb-4 inline-block rounded-full bg-accent px-4 py-1 text-sm font-semibold text-primary-dark">
                           {t(product.taglineTwo)}
                         </div>
                       )}
-                      <h2 className="mb-4 font-serif text-4xl font-bold text-foreground">
+                      <h2 className="mb-4 font-serif text-xl sm:text-2xl lg:text-4xl font-bold text-foreground">
                         {t(product.name)}
                       </h2>
                       {t(product.taglineOne) && (
@@ -223,7 +231,7 @@ export default function ProductsPage() {
                     </div>
 
                     {/* Image */}
-                    <div className={index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}>
+                    <div className={`order-first lg:order-none ${index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
                       <Link href={`/products/${product.slug}`} className="block">
                         <div className="group relative overflow-hidden rounded-lg shadow-2xl">
                           <img

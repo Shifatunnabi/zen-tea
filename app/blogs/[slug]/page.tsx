@@ -81,7 +81,7 @@ export default function BlogPostPage() {
   if (notFound || !blog) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-        <h1 className="mb-4 font-serif text-4xl font-bold text-foreground">
+        <h1 className="mb-4 font-serif text-xl sm:text-3xl lg:text-4xl font-bold text-foreground">
           {t({ en: 'Article Not Found', bn: 'নিবন্ধ পাওয়া যায়নি', ar: 'المقال غير موجود' })}
         </h1>
         <p className="mb-8 text-lg text-muted-foreground">

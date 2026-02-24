@@ -11,14 +11,14 @@ export function CTASection() {
   return (
     <section className="bg-primary py-20 text-white">
       <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
-        <h2 className="mb-4 font-serif text-4xl font-bold lg:text-5xl">
+        <h2 className="mb-4 font-serif text-2xl sm:text-3xl lg:text-5xl font-bold">
           {t({ 
             en: 'Partner With Zen Tea',
             bn: 'জেন টি-র সাথে অংশীদার হন',
             ar: 'كن شريكًا مع زن تي'
           })}
         </h2>
-        <p className="mb-8 text-lg leading-relaxed text-white/90">
+        <p className="mb-8 text-sm sm:text-base lg:text-lg leading-relaxed text-white/90">
           {t({ 
             en: 'Join our network of international dealers, retailers, and distributors. Experience competitive wholesale pricing and authentic Bangladeshi tea quality.',
             bn: 'আমাদের আন্তর্জাতিক ডিলার, খুচরা বিক্রেতা এবং পরিবেশকদের নেটওয়ার্কে যোগ দিন। প্রতিযোগিতামূলক পাইকারি মূল্য এবং খাঁটি বাংলাদেশী চা মান অনুভব করুন।',

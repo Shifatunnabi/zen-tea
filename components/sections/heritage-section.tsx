@@ -31,18 +31,30 @@ export function HeritageSection() {
 
   const videoUrl = heritage?.video || ''
 
+  const isGif = videoUrl && videoUrl.toLowerCase().includes('.gif')
+  const isVideo = videoUrl && !isGif
+
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="relative">
-            {videoUrl ? (
-              <video
+            {isGif ? (
+              <img
                 src={videoUrl}
-                controls
+                alt="Heritage"
                 className="w-full rounded-lg shadow-xl object-cover"
                 style={{ aspectRatio: '1/1' }}
-                poster="/placeholder.svg?height=600&width=600"
+              />
+            ) : isVideo ? (
+              <video
+                src={videoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full rounded-lg shadow-xl object-cover"
+                style={{ aspectRatio: '1/1' }}
               />
             ) : (
               <div className="relative rounded-lg shadow-xl overflow-hidden bg-primary-dark" style={{ aspectRatio: '1/1' }}>
@@ -60,13 +72,13 @@ export function HeritageSection() {
             )}
           </div>
           <div>
-            <h2 className="mb-6 font-serif text-4xl font-bold text-foreground lg:text-5xl">
+            <h2 className="mb-6 font-serif text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground">
               {headline}
             </h2>
-            <p className="mb-4 text-lg leading-relaxed text-muted-foreground">
+            <p className="mb-4 text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
               {description}
             </p>
-            <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
+            <p className="mb-6 text-sm sm:text-base lg:text-lg leading-relaxed text-muted-foreground">
               {t({
                 en: 'Our commitment to traditional plucking methods ensures that every cup delivers the authentic taste of Bangladeshi tea culture.',
                 bn: 'ঐতিহ্যবাহী তোলার পদ্ধতির প্রতি আমাদের প্রতিশ্রুতি নিশ্চিত করে যে প্রতিটি কাপ বাংলাদেশী চা সংস্কৃতির খাঁটি স্বাদ প্রদান করে।',

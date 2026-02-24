@@ -50,14 +50,14 @@ export function ValuesSection() {
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 font-serif text-4xl font-bold text-foreground lg:text-5xl">
+          <h2 className="mb-4 font-serif text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground">
             {t({ 
               en: 'Our Core Values',
               bn: 'আমাদের মূল মূল্যবোধ',
               ar: 'قيمنا الأساسية'
             })}
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-sm sm:text-base lg:text-lg text-muted-foreground">
             {t({ 
               en: 'The principles that guide everything we do',
               bn: 'যে নীতিগুলি আমরা যা করি তা পরিচালনা করে',

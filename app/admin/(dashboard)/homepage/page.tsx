@@ -384,10 +384,10 @@ export default function AdminHomepage() {
       <Section title="Heritage Section">
         <div className="space-y-4">
           <FileUpload
-            label="Heritage Video"
+            label="Heritage Video / GIF"
             value={heritage.video}
             onChange={(url) => setHeritage({ ...heritage, video: url })}
-            accept="video/*"
+            accept="video/mp4,video/webm,video/ogg,image/gif"
           />
 
           <div className="grid gap-4 md:grid-cols-2">

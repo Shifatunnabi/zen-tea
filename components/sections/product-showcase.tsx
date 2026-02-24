@@ -48,10 +48,10 @@ export function ProductShowcase() {
     <section className="bg-muted py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 font-serif text-4xl font-bold text-foreground lg:text-5xl">
+          <h2 className="mb-4 font-serif text-2xl sm:text-3xl lg:text-5xl font-bold text-foreground">
             {t({ en: 'Our Premium Product Lines', bn: 'আমাদের প্রিমিয়াম পণ্য লাইন', ar: 'خطوط منتجاتنا الفاخرة' })}
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-sm sm:text-base lg:text-lg text-muted-foreground">
             {t({ en: 'Three distinctive blends crafted for discerning tea lovers and wholesale partners', bn: 'বিচক্ষণ চা প্রেমী এবং পাইকারি অংশীদারদের জন্য তৈরি তিনটি স্বতন্ত্র মিশ্রণ', ar: 'ثلاث خلطات مميزة مصنوعة لمحبي الشاي المميزين وشركاء الجملة' })}
           </p>
         </div>

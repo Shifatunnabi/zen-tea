@@ -41,7 +41,11 @@ export default function FileUpload({
     }
   }
 
-  const isVideo = value && (value.endsWith('.mp4') || value.endsWith('.webm') || value.endsWith('.mov'))
+  const isGif = value && value.toLowerCase().includes('.gif')
+  const isVideo = value && !isGif && (
+    value.includes('/video/upload/') ||
+    /\.(mp4|webm|mov|ogg)$/i.test(value)
+  )
 
   return (
     <div className="space-y-2">
@@ -50,7 +54,9 @@ export default function FileUpload({
       {value ? (
         <div className="relative inline-block rounded-lg border overflow-hidden" style={{ aspectRatio }}>
           {isVideo ? (
-            <video src={value} className="h-40 object-cover" controls />
+            <video src={value} className="h-40 object-cover" autoPlay loop muted playsInline />
+          ) : isGif ? (
+            <img src={value} alt="" className="h-40 w-auto object-cover" />
           ) : (
             <Image src={value} alt="" width={320} height={180} className="h-40 w-auto object-cover" />
           )}

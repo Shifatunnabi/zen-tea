@@ -68,70 +68,85 @@ export function HeroSection() {
   const currentSlide = slides[currentIndex]
 
   return (
-    <section className="relative overflow-hidden bg-primary-dark">
-      <div className="absolute inset-0">
-        <img
-          src={currentSlide.image}
-          alt="Tea gardens"
-          className="h-full w-full object-cover opacity-30 transition-opacity duration-500"
-          key={currentSlide._id}
-        />
-      </div>
-      
-      <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
-        <div className="max-w-3xl">
-          <h1 className="mb-6 font-serif text-5xl font-bold leading-tight text-white lg:text-7xl">
-            {t(currentSlide.headline)}
-          </h1>
-          <p className="mb-8 text-xl leading-relaxed text-white/90 lg:text-2xl">
-            {t(currentSlide.subtext)}
-          </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" asChild className="bg-accent text-primary-dark hover:bg-accent/90">
-              <Link href="/products">
-                {t({ en: 'Explore Products', bn: 'পণ্য দেখুন', ar: 'استكشف المنتجات' })} <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white hover:text-primary-dark">
-              <Link href="/about">{t({ en: 'Learn Our Story', bn: 'আমাদের গল্প জানুন', ar: 'تعرف على قصتنা' })}</Link>
-            </Button>
+    <section className="relative w-full overflow-hidden bg-primary-dark aspect-square md:aspect-[20/7] min-h-[200px]">
+      {/* Background image fills the frame */}
+      <img
+        src={currentSlide.image}
+        alt="Tea gardens"
+        className="absolute inset-0 h-full w-full object-cover opacity-50 transition-opacity duration-500"
+        key={currentSlide._id}
+      />
+
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-dark/70 via-primary-dark/30 to-transparent" />
+
+      {/* Text content — bottom-left on mobile, centred vertically on md+ */}
+      <div className="absolute inset-0 flex items-end pb-5 md:items-center md:pb-0">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+          <div className="max-w-[80%] sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+            <h1 className="mb-1 sm:mb-3 lg:mb-6 font-serif font-bold leading-tight text-white text-base sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl">
+              {t(currentSlide.headline)}
+            </h1>
+            <p className="mb-2 sm:mb-4 lg:mb-8 text-white/85 leading-snug text-[11px] sm:text-sm md:text-base lg:text-xl line-clamp-2 sm:line-clamp-none">
+              {t(currentSlide.subtext)}
+            </p>
+            <div className="flex flex-row gap-1.5 sm:gap-4">
+              <Button
+                size="sm"
+                asChild
+                className="bg-accent text-primary-dark hover:bg-accent/90 text-[10px] sm:text-sm lg:text-base h-7 sm:h-10 px-2.5 sm:px-5 lg:px-6"
+              >
+                <Link href="/products">
+                  {t({ en: 'Explore Products', bn: 'পণ্য দেখুন', ar: 'استكشف المنتجات' })}
+                  <ArrowRight className="ml-1 h-2.5 w-2.5 sm:h-4 sm:w-4 sm:ml-2" />
+                </Link>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                asChild
+                className="border-white text-white hover:bg-white hover:text-primary-dark text-[10px] sm:text-sm lg:text-base h-7 sm:h-10 px-2.5 sm:px-5 lg:px-6"
+              >
+                <Link href="/about">{t({ en: 'Our Story', bn: 'আমাদের গল্প', ar: 'قصتنا' })}</Link>
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* Navigation Arrows */}
-        {slides.length > 1 && (
-          <>
-            <button
-              onClick={goToPrevious}
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <button
-              onClick={goToNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/20 p-2 text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-
-            {/* Dots Navigation */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/50'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
       </div>
+
+      {/* Arrows hidden on mobile, pinned to boundary on desktop */}
+      {slides.length > 1 && (
+        <>
+          <button
+            onClick={goToPrevious}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 items-center justify-center rounded-r-lg bg-white/20 p-3 text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            onClick={goToNext}
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 items-center justify-center rounded-l-lg bg-white/20 p-3 text-white backdrop-blur-sm hover:bg-white/30 transition-colors"
+            aria-label="Next slide"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+
+          {/* Dots */}
+          <div className="absolute bottom-1.5 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-1 sm:h-2 rounded-full transition-all ${
+                  index === currentIndex ? 'w-3 sm:w-8 bg-white' : 'w-1 sm:w-2 bg-white/50'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   )
 }

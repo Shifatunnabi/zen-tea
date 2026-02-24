@@ -188,8 +188,8 @@ export default function ProductDetailPage() {
         </Link>
 
         {/* Top Section: Two columns */}
-        <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
-          {/* LEFT: Photo slider */}
+        <div className="mt-6 flex flex-col gap-10 lg:grid lg:grid-cols-2">
+          {/* Photo slider — first in DOM so it appears on top in mobile */}
           <div className="space-y-4">
             {/* Main image */}
             <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-muted">

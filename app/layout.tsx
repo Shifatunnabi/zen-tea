@@ -4,6 +4,8 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import React from 'react'
 import { LanguageProvider } from '@/lib/language-context'
+import { LoadingScreen } from '@/components/loading-screen'
+import { NavigationLoader } from '@/components/navigation-loader'
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -44,6 +46,8 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${inter.variable} ${notoSansBengali.variable}`}>
       <body className="font-sans antialiased">
         <LanguageProvider>
+          <LoadingScreen />
+          <NavigationLoader />
           <Header />
           <main>{children}</main>
           <Footer />
