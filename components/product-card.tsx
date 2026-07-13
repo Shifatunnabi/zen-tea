@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
 
@@ -21,16 +22,20 @@ export function ProductCard({ name, description, image, hoverImage, slug }: Prod
       className="group relative overflow-hidden rounded-lg bg-card shadow-lg transition-all hover:shadow-xl"
     >
       <div className="aspect-square overflow-hidden relative">
-        <img
+        <Image
           src={image || "/placeholder.svg"}
           alt={name}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105 transition-transform duration-300'}`}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+          className={`object-cover transition-opacity duration-500 ${hoverImage ? 'group-hover:opacity-0' : 'group-hover:scale-105 transition-transform duration-300'}`}
         />
         {hoverImage && (
-          <img
+          <Image
             src={hoverImage}
             alt={`${name} alternate`}
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           />
         )}
       </div>

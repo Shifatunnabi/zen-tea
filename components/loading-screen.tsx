@@ -9,12 +9,12 @@ export function LoadingScreen() {
   const [fadeOut, setFadeOut] = useState(false)
 
   useEffect(() => {
-    // Text + line appear right as logo animation finishes (1.6s)
-    const textTimer = setTimeout(() => setShowText(true), 1550)
-    // Begin fade-out at 3.8s
-    const fadeTimer = setTimeout(() => setFadeOut(true), 3800)
-    // Unmount at 4.6s (after 800ms transition)
-    const removeTimer = setTimeout(() => setVisible(false), 4600)
+    // Text + line appear right as logo animation finishes
+    const textTimer = setTimeout(() => setShowText(true), 300)
+    // Begin fade-out shortly after
+    const fadeTimer = setTimeout(() => setFadeOut(true), 650)
+    // Unmount after the fade transition
+    const removeTimer = setTimeout(() => setVisible(false), 1050)
 
     return () => {
       clearTimeout(textTimer)
@@ -27,7 +27,7 @@ export function LoadingScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-[800ms] ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-400 ${
         fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -57,7 +57,7 @@ export function LoadingScreen() {
           {/* Progress line — fills left to right */}
           <div className="h-[5px] w-52 overflow-hidden rounded-full bg-border">
             <div
-              className={`h-full rounded-full bg-primary transition-all duration-[2500ms] ease-out ${
+              className={`h-full rounded-full bg-primary transition-all duration-300 ease-out ${
                 showText ? 'w-full' : 'w-0'
               }`}
             />

@@ -2,25 +2,16 @@
 
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useLanguage } from '@/lib/language-context'
 
-export function Header() {
+export function Header({ initialLogo = '' }: { initialLogo?: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [logo, setLogo] = useState<string>('')
+  const logo = initialLogo
   const { t } = useLanguage()
-
-  useEffect(() => {
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data?.logo) setLogo(data.logo)
-      })
-      .catch(() => {})
-  }, [])
 
   const navigation = [
     { name: t({ en: 'Home', bn: 'হোম', ar: 'الرئيسية' }), href: '/' },

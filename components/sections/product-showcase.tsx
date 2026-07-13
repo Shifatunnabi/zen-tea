@@ -2,7 +2,6 @@
 
 import { useLanguage } from '@/lib/language-context'
 import { ProductCard } from '@/components/product-card'
-import { useEffect, useState } from 'react'
 
 const FALLBACK_PRODUCTS = [
   {
@@ -28,21 +27,10 @@ const FALLBACK_PRODUCTS = [
   },
 ]
 
-export function ProductShowcase() {
+export function ProductShowcase({ initialProducts = [] }: { initialProducts?: any[] }) {
   const { t } = useLanguage()
-  const [products, setProducts] = useState<any[]>([])
-
-  useEffect(() => {
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(data => {
-        const visible = (data || []).filter((p: any) => !p.isHidden)
-        setProducts(visible.length > 0 ? visible : FALLBACK_PRODUCTS)
-      })
-      .catch(() => setProducts(FALLBACK_PRODUCTS))
-  }, [])
-
-  const displayProducts = products.length > 0 ? products : FALLBACK_PRODUCTS
+  const visible = initialProducts.filter((p: any) => !p.isHidden)
+  const displayProducts = visible.length > 0 ? visible : FALLBACK_PRODUCTS
 
   return (
     <section className="bg-muted py-20">

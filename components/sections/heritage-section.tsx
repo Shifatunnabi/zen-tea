@@ -1,21 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Play } from 'lucide-react'
 import { useLanguage } from '@/lib/language-context'
-import { useEffect, useState } from 'react'
 
-export function HeritageSection() {
+export function HeritageSection({ initialHeritage = null }: { initialHeritage?: any }) {
   const { t } = useLanguage()
-  const [heritage, setHeritage] = useState<any>(null)
-
-  useEffect(() => {
-    fetch('/api/heritage')
-      .then(r => r.json())
-      .then(data => setHeritage(data))
-      .catch(() => {})
-  }, [])
+  const heritage = initialHeritage
 
   const headline = heritage?.headline
     ? t(heritage.headline)
@@ -40,12 +33,16 @@ export function HeritageSection() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div className="relative">
             {isGif ? (
-              <img
-                src={videoUrl}
-                alt="Heritage"
-                className="w-full rounded-lg shadow-xl object-cover"
-                style={{ aspectRatio: '1/1' }}
-              />
+              <div className="relative w-full rounded-lg shadow-xl overflow-hidden" style={{ aspectRatio: '1/1' }}>
+                <Image
+                  src={videoUrl}
+                  alt="Heritage"
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  unoptimized={videoUrl.toLowerCase().endsWith('.gif')}
+                  className="object-cover"
+                />
+              </div>
             ) : isVideo ? (
               <video
                 src={videoUrl}
@@ -58,10 +55,12 @@ export function HeritageSection() {
               />
             ) : (
               <div className="relative rounded-lg shadow-xl overflow-hidden bg-primary-dark" style={{ aspectRatio: '1/1' }}>
-                <img
+                <Image
                   src="/placeholder.svg?height=600&width=800"
                   alt="Heritage video placeholder"
-                  className="h-full w-full object-cover opacity-60"
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover opacity-60"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">

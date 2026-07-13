@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { useLanguage, TranslationObject } from '@/lib/language-context'
 
 interface CoreValue {
@@ -15,6 +16,7 @@ interface CoreValue {
 interface CoreValuesSectionProps {
   title?: TranslationObject
   subtitle?: TranslationObject
+  initialValues?: CoreValue[]
 }
 
 const FALLBACK_VALUES: CoreValue[] = [
@@ -105,11 +107,13 @@ function CoreValueItem({
       {/* 20:7 aspect ratio container */}
       <div className="relative w-full" style={{ aspectRatio: '20 / 7' }}>
         {/* Background image */}
-        <img
+        <Image
           src={value.image}
           alt={t(value.name as TranslationObject)}
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="100vw"
           loading="lazy"
+          className="object-cover"
         />
 
         {/* Dark overlay for readability */}
@@ -149,28 +153,10 @@ function CoreValueItem({
   )
 }
 
-export function CoreValuesSection({ title, subtitle }: CoreValuesSectionProps) {
+export function CoreValuesSection({ title, subtitle, initialValues = [] }: CoreValuesSectionProps) {
   const { t } = useLanguage()
-  const [values, setValues] = useState<CoreValue[]>([])
-  const [loaded, setLoaded] = useState(false)
-
-  const fetchValues = useCallback(async () => {
-    try {
-      const res = await fetch('/api/core-values')
-      if (!res.ok) throw new Error('Failed to fetch')
-      const data: CoreValue[] = await res.json()
-      const visible = data.filter((v) => !v.isHidden)
-      setValues(visible.length > 0 ? visible : FALLBACK_VALUES)
-    } catch {
-      setValues(FALLBACK_VALUES)
-    } finally {
-      setLoaded(true)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchValues()
-  }, [fetchValues])
+  const visible = initialValues.filter((v) => !v.isHidden)
+  const values = visible.length > 0 ? visible : FALLBACK_VALUES
 
   const heading = title
     ? t(title)
@@ -187,26 +173,6 @@ export function CoreValuesSection({ title, subtitle }: CoreValuesSectionProps) {
         bn: 'যে নীতিগুলি আমরা যা করি তা পরিচালনা করে',
         ar: 'المبادئ التي توجه كل ما نقوم به',
       })
-
-  if (!loaded) {
-    return (
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-6 text-center lg:px-8">
-          <div className="mb-4 h-10 w-64 mx-auto animate-pulse rounded bg-muted" />
-          <div className="mb-12 h-6 w-96 mx-auto animate-pulse rounded bg-muted" />
-          <div className="space-y-0">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-full animate-pulse bg-muted"
-                style={{ aspectRatio: '20 / 7' }}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   return (
     <section className="py-20">

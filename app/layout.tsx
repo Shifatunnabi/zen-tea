@@ -6,6 +6,18 @@ import React from 'react'
 import { LanguageProvider } from '@/lib/language-context'
 import { LoadingScreen } from '@/components/loading-screen'
 import { NavigationLoader } from '@/components/navigation-loader'
+import dbConnect from '@/lib/mongodb'
+import SiteSettings from '@/lib/models/SiteSettings'
+
+async function getLogo(): Promise<string> {
+  try {
+    await dbConnect()
+    const settings = await SiteSettings.findOne().lean<{ logo?: string }>()
+    return settings?.logo || ''
+  } catch {
+    return ''
+  }
+}
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -37,18 +49,20 @@ export const viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const logo = await getLogo()
+
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable} ${notoSansBengali.variable}`}>
       <body className="font-sans antialiased">
         <LanguageProvider>
           <LoadingScreen />
           <NavigationLoader />
-          <Header />
+          <Header initialLogo={logo} />
           <main>{children}</main>
           <Footer />
         </LanguageProvider>

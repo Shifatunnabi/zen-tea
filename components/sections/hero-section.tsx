@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -32,22 +33,13 @@ const FALLBACK_SLIDE: CarouselSlide = {
   isHidden: false
 }
 
-export function HeroSection() {
+export function HeroSection({ initialSlides = [] }: { initialSlides?: CarouselSlide[] }) {
   const { t } = useLanguage()
-  const [slides, setSlides] = useState<CarouselSlide[]>([FALLBACK_SLIDE])
+  const visibleInitialSlides = initialSlides.filter((s) => !s.isHidden)
+  const [slides] = useState<CarouselSlide[]>(
+    visibleInitialSlides.length > 0 ? visibleInitialSlides : [FALLBACK_SLIDE]
+  )
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    fetch('/api/carousel')
-      .then(r => r.json())
-      .then(data => {
-        const visibleSlides = (data || []).filter((s: CarouselSlide) => !s.isHidden)
-        if (visibleSlides.length > 0) {
-          setSlides(visibleSlides)
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   useEffect(() => {
     if (slides.length <= 1) return
@@ -70,10 +62,13 @@ export function HeroSection() {
   return (
     <section className="relative w-full overflow-hidden bg-primary-dark aspect-square md:aspect-[20/7] min-h-[200px]">
       {/* Background image fills the frame */}
-      <img
+      <Image
         src={currentSlide.image}
         alt="Tea gardens"
-        className="absolute inset-0 h-full w-full object-cover opacity-50 transition-opacity duration-500"
+        fill
+        priority={currentIndex === 0}
+        sizes="100vw"
+        className="object-cover opacity-50 transition-opacity duration-500"
         key={currentSlide._id}
       />
 
